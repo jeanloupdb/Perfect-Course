@@ -1,0 +1,4 @@
+git add --all
+git commit -m "_"
+git pull origin main
+git push origin main
