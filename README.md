@@ -2,6 +2,8 @@
 
 ... PROJET EN COURS ...
 
+https://perfectcourse.neocities.org/
+
 Votre allié pour optimiser votre temps et vos forces
 
 
