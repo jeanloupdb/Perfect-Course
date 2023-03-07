@@ -2,6 +2,8 @@
 #include <err.h>
 #include <string.h>
 #include <stdlib.h>
+#include <SDL2/SDL.h>
+
 
 /*struct PlanStock
 {
@@ -191,4 +193,87 @@ struct Graph *FileRead(char *filename)
 	/* créer le noeud debut et le relier au noeud top/bottom du rayon*/
 	fclose(file);
 	return &G;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////       IMPLEMENTATION GRAPHIQUE         //////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Structure pour stocker les données d'un cercle
+typedef struct {
+    int x;
+    int y;
+    int r;
+} Circle;
+
+// Structure pour stocker les données d'un rayon
+typedef struct {
+    Circle origin; // Point de départ du rayon
+    Circle target; // Point d'arrivée du rayon
+} Ray;
+
+// Fonction pour dessiner un cercle
+void drawCircle(SDL_Renderer *renderer, Circle *circle) {
+    for(int i = 0; i < circle->r * 2; i++) {
+        for(int j = 0; j < circle->r * 2; j++) {
+            int dx = circle->r - i;
+            int dy = circle->r - j;
+            if((dx*dx + dy*dy) <= (circle->r * circle->r)) {
+                SDL_RenderDrawPoint(renderer, circle->x + dx, circle->y + dy);
+            }
+        }
+    }
+}
+
+// Fonction pour dessiner un rayon
+void drawRay(SDL_Renderer *renderer, Ray *ray) {
+    SDL_RenderDrawLine(renderer, ray->origin.x, ray->origin.y, ray->target.x, ray->target.y);
+}
+
+// Fonction pour dessiner le graph
+void drawGraph(SDL_Renderer *renderer, struct Graph *graph) {
+    // Dessiner chaque noeud sous forme de cercle
+    for(int i = 0; i < graph->order; i++) {
+        Circle circle = {graph->tableNodes[i]->X, graph->tableNodes[i]->Y, 10};
+        drawCircle(renderer, &circle);
+    }
+    // Dessiner chaque lien entre les noeuds sous forme de rayon
+    for(int i = 0; i < graph->order; i++) {
+        struct Node *node = graph->tableNodes[i];
+        for(int j = 0; j < node->nbAdj; j++) {
+            struct Node *adj = node->adjTab[j];
+            Ray ray = {{node->X, node->Y, 10}, {adj->X, adj->Y, 10}};
+            drawRay(renderer, &ray);
+        }
+    }
+}
+
+// Fonction principale
+int main(int argc, char *argv[]) {
+    // Initialisation de SDL
+    SDL_Init(SDL_INIT_VIDEO);
+    // Création de la fenêtre
+    SDL_Window *window = SDL_CreateWindow("Magasin", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, 0);
+    // Création du renderer
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    // Fond blanc
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
+    // Dessiner le graph
+    drawGraph(renderer, &G);
+    // Afficher la fenêtre
+    SDL_RenderPresent(renderer);
+    // Attendre que l'utilisateur quitte
+    SDL_Event event;
+    while(SDL_WaitEvent(&event) >= 0) {
+        if(event.type == SDL_QUIT) {
+            break;
+        }
+    }
+    // Libérer la mémoire
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    return 0;
 }
