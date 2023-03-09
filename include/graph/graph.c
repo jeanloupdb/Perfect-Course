@@ -2,11 +2,14 @@
 #include <err.h>
 #include <string.h>
 #include <stdlib.h>
-#include <SDL2/SDL.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
+#include <math.h>
 
 
 /*struct PlanStock
-{
+{ 
 	int nbRangees;
 	int nbCasiers;
 	int produit[][];
@@ -167,13 +170,13 @@ struct Graph *FileRead(char *filename)
 
 	while((fgets(buffer,256,file) != NULL) && (sscanf(buffer,"%d_%s %d_%s", &aisle_1, botop_1, &aisle_2, botop_2) == 4))
 	{	
-		if ((strcmp(botop_1,"top") == 0) && (strcmp(botop_1,"top") == 0))
+		if ((strcmp(botop_1,"top") == 0) && (strcmp(botop_2,"top") == 0))
 			createLink(getNodeIntermediate(aisle_1,1),getNodeIntermediate(aisle_2,1));
-		if ((strcmp(botop_1,"bottom") == 0) && (strcmp(botop_1,"top") == 0))
+		if ((strcmp(botop_1,"bottom") == 0) && (strcmp(botop_2,"top") == 0))
 			createLink(getNodeIntermediate(aisle_1,0),getNodeIntermediate(aisle_2,1));
-		if ((strcmp(botop_1,"top") == 0) && (strcmp(botop_1,"bottom") == 0))
+		if ((strcmp(botop_1,"top") == 0) && (strcmp(botop_2,"bottom") == 0))
 			createLink(getNodeIntermediate(aisle_1,1),getNodeIntermediate(aisle_2,0));
-		if ((strcmp(botop_1,"bottom") == 0) && (strcmp(botop_1,"bottom") == 0))
+		if ((strcmp(botop_1,"bottom") == 0) && (strcmp(botop_2,"bottom") == 0))
 			createLink(getNodeIntermediate(aisle_1,0),getNodeIntermediate(aisle_2,0));
 		/*printf("%d%s - %d%s \n", aisle_1, botop_1, aisle_2, botop_2);*/
 		/* lien entre noeud top/bottom du rayon 1 et le noeud top/bottom du rayon 2*/
@@ -195,85 +198,123 @@ struct Graph *FileRead(char *filename)
 	return &G;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////       IMPLEMENTATION GRAPHIQUE         //////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Structure pour stocker les données d'un cercle
-typedef struct {
-    int x;
-    int y;
-    int r;
-} Circle;
-
-// Structure pour stocker les données d'un rayon
-typedef struct {
-    Circle origin; // Point de départ du rayon
-    Circle target; // Point d'arrivée du rayon
-} Ray;
-
-// Fonction pour dessiner un cercle
-void drawCircle(SDL_Renderer *renderer, Circle *circle) {
-    for(int i = 0; i < circle->r * 2; i++) {
-        for(int j = 0; j < circle->r * 2; j++) {
-            int dx = circle->r - i;
-            int dy = circle->r - j;
-            if((dx*dx + dy*dy) <= (circle->r * circle->r)) {
-                SDL_RenderDrawPoint(renderer, circle->x + dx, circle->y + dy);
-            }
-        }
-    }
-}
-
-// Fonction pour dessiner un rayon
-void drawRay(SDL_Renderer *renderer, Ray *ray) {
-    SDL_RenderDrawLine(renderer, ray->origin.x, ray->origin.y, ray->target.x, ray->target.y);
-}
-
-// Fonction pour dessiner le graph
-void drawGraph(SDL_Renderer *renderer, struct Graph *graph) {
-    // Dessiner chaque noeud sous forme de cercle
+void freeGraph(struct Graph *graph) {
+    // Libération de la mémoire allouée pour chaque noeud
     for(int i = 0; i < graph->order; i++) {
-        Circle circle = {graph->tableNodes[i]->X, graph->tableNodes[i]->Y, 10};
-        drawCircle(renderer, &circle);
+        free(graph->tableNodes[i]);
     }
-    // Dessiner chaque lien entre les noeuds sous forme de rayon
-    for(int i = 0; i < graph->order; i++) {
-        struct Node *node = graph->tableNodes[i];
-        for(int j = 0; j < node->nbAdj; j++) {
-            struct Node *adj = node->adjTab[j];
-            Ray ray = {{node->X, node->Y, 10}, {adj->X, adj->Y, 10}};
-            drawRay(renderer, &ray);
-        }
-    }
+    // Libération de la mémoire allouée pour le tableau de noeuds
+    free(graph->tableNodes);
+    // Libération de la mémoire allouée pour le graphe
+    free(graph);
 }
 
-// Fonction principale
-int main(int argc, char *argv[]) {
-    // Initialisation de SDL
-    SDL_Init(SDL_INIT_VIDEO);
-    // Création de la fenêtre
-    SDL_Window *window = SDL_CreateWindow("Magasin", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, 0);
-    // Création du renderer
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    // Fond blanc
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderClear(renderer);
-    // Dessiner le graph
-    drawGraph(renderer, &G);
-    // Afficher la fenêtre
-    SDL_RenderPresent(renderer);
-    // Attendre que l'utilisateur quitte
-    SDL_Event event;
-    while(SDL_WaitEvent(&event) >= 0) {
-        if(event.type == SDL_QUIT) {
-            break;
-        }
-    }
-    // Libérer la mémoire
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    return 0;
+//representation graphique :
+
+ 
+//                                                                               mm               mm      db                                                                   `7MM          db                                  
+//                                                                               MM               MM                                                                             MM                                              
+// `7Mb,od8  .gP"Ya  `7MMpdMAo. `7Mb,od8  .gP"Ya  ,pP"Ybd  .gP"Ya  `7MMpMMMb.  mmMMmm   ,6"Yb.  mmMMmm  `7MM   ,pW"Wq.  `7MMpMMMb.       .P"Ybmmm `7Mb,od8  ,6"Yb.  `7MMpdMAo.   MMpMMMb.  `7MM    ,dW"Yvd  `7MM  `7MM   .gP"Ya  
+//   MM' "' ,M'   Yb   MM   `Wb   MM' "' ,M'   Yb 8I   `" ,M'   Yb   MM    MM    MM    8)   MM    MM      MM  6W'   `Wb   MM    MM      :MI  I8     MM' "' 8)   MM    MM   `Wb   MM    MM    MM   ,W'   MM    MM    MM  ,M'   Yb 
+//   MM     8M""""""   MM    M8   MM     8M"""""" `YMMMa. 8M""""""   MM    MM    MM     ,pm9MM    MM      MM  8M     M8   MM    MM       WmmmP"     MM      ,pm9MM    MM    M8   MM    MM    MM   8M    MM    MM    MM  8M"""""" 
+//   MM     YM.    ,   MM   ,AP   MM     YM.    , L.   I8 YM.    ,   MM    MM    MM    8M   MM    MM      MM  YA.   ,A9   MM    MM      8M          MM     8M   MM    MM   ,AP   MM    MM    MM   YA.   MM    MM    MM  YM.    , 
+// .JMML.    `Mbmmd'   MMbmmd'  .JMML.    `Mbmmd' M9mmmP'  `Mbmmd' .JMML  JMML.  `Mbmo `Moo9^Yo.  `Mbmo .JMML. `Ybmd9'  .JMML  JMML.     YMMMMMb  .JMML.   `Moo9^Yo.  MMbmmd'  .JMML  JMML..JMML.  `MbmdMM    `Mbod"YML. `Mbmmd' 
+//                     MM                                                                                                               6'     dP                     MM                                MM                       
+//                   .JMML.                                                                                                             Ybmmmd'                     .JMML.                            .JMML.        
+
+
+
+// Fonction de dessin des carrés
+void drawSquare(int x, int y, int size) {
+	glBegin(GL_QUADS);
+	glColor3f(0.0f, 0.0f, 1.0f); // Bleu
+	glVertex2i(x - size, y - size);
+	glVertex2i(x + size, y - size);
+	glVertex2i(x + size, y + size);
+	glVertex2i(x - size, y + size);
+	glEnd();
+}
+
+// Fonction de dessin des traits
+void drawLine(int x1, int y1, int x2, int y2) {
+	glBegin(GL_LINES);
+	glVertex2i(x1, y1);
+	glVertex2i(x2, y2);
+	glEnd();
+}
+
+// Fonction d'affichage
+void display() {
+	glClear(GL_COLOR_BUFFER_BIT);
+	// Creer le Magasin :
+	struct Graph *SHOP;
+	SHOP = malloc(sizeof(struct Graph));
+	SHOP = FileRead("shop1.txt");
+
+	
+	
+	// Dessiner les traits pour les liens
+	glColor3f(1.0, 0.0, 0.0); // Rouge
+	for (int i = 0; i < SHOP->order; i++) {
+		struct Node *node = SHOP->tableNodes[i];
+		for (int j = 0; j < node->nbAdj; j++) {
+			struct Node *adjNode = node->adjTab[j];
+			double distance = sqrt(pow(adjNode->X - node->X, 2) + pow(adjNode->Y - node->Y, 2));
+			if (distance >= 2.5) { // Si lien entre rayons
+				
+				// Modifier l'épaisseur de la ligne
+        		glLineWidth(1);
+				glColor3f(0.0, 1.0, 0.0); // Vert pour les liens entre rayons
+			}else{
+				// Modifier l'épaisseur de la ligne
+        		glLineWidth(5);
+				glColor3f(1.0, 0.0, 0.0); // Rouge pour les liens entre article
+			}
+			drawLine(node->X * 50, node->Y * 40, adjNode->X * 50, adjNode->Y * 40);
+		}
+	}
+
+	// Dessiner les carrés pour les articles
+	glColor3f(0.0, 0.0, 1.0); // Bleu
+	int size = 7;
+	for (int i = 0; i < SHOP->order; i++) {
+		struct Node *node = SHOP->tableNodes[i];
+		int x = node->X * 50;
+		int y = node->Y * 40;
+		drawSquare(x, y, size);
+	}
+
+
+	// Rafraîchir l'affichage
+	glutSwapBuffers();
+}
+
+	// Fonction d'initialisation
+void init() {
+	glClearColor(1.0, 1.0, 1.0, 0.0); // Blanc
+}
+
+	// Fonction de redimensionnement de la fenêtre
+void reshape(int w, int h) {
+	// origine du repere 
+	int x_origin = 100;
+	int y_origin = 100;
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	float aspect_ratio = (float) w / h;
+	gluOrtho2D(-x_origin, 800, -y_origin, 600);
+	glMatrixMode(GL_MODELVIEW);
+}
+
+int main(int argc, char **argv) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowSize(800, 600);
+	glutCreateWindow("Magasin");
+	init();
+	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
+	glutMainLoop();
+	return 0;
 }
