@@ -1,4 +1,4 @@
 git add --all
-git commit -m "imp. graphique dans graph.c"
+git commit -m "imp. graphique dans graph.c openGL"
 git pull origin main
 git push origin main
