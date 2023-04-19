@@ -7,7 +7,7 @@
 #include <GL/glut.h>
 #include <math.h>
 
-
+  
 /*struct PlanStock
 { 
 	int nbRangees;
