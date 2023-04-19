@@ -263,11 +263,11 @@ void display() {
 			if (distance >= 2.5) { // Si lien entre rayons
 				
 				// Modifier l'épaisseur de la ligne
-        		glLineWidth(1);
+        			glLineWidth(1);
 				glColor3f(0.0, 1.0, 0.0); // Vert pour les liens entre rayons
 			}else{
 				// Modifier l'épaisseur de la ligne
-        		glLineWidth(5);
+        			glLineWidth(5);
 				glColor3f(1.0, 0.0, 0.0); // Rouge pour les liens entre article
 			}
 			drawLine(node->X * 50, node->Y * 40, adjNode->X * 50, adjNode->Y * 40);
