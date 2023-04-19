@@ -6,6 +6,7 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <math.h>
+#include "graph.h"
 
   
 /*struct PlanStock
@@ -15,27 +16,11 @@
 	int produit[][];
 };*/
 
-struct Graph
-{
-	int order; /* nb de noeuds */
-	struct Node *tableNodes[512];
-};
+
 
 struct Graph G;
 
-struct Node 
-{
-	int boolShelf;/*si 0 -> intermediate, si 1 -> shelf, si 2 -> debut*/
-	int aisle;
-	int shelf;
-	int boolTopBottom; /*si boolShelf = 0, btb = 1 si top, sinon 0*/
-	struct Node *adjTab[10];
-	int nbAdj;
-	int X;
-	int Y;
-	int productsTab[3];
-	int nbProducts;
-};
+
 
 void printNode(struct Node *node)
 {
@@ -67,6 +52,7 @@ struct Node *createNode(int boolShelf, int aisle, int shelf, int boolTopBottom, 
 	node->shelf=shelf;
 	node->boolTopBottom=boolTopBottom;
 	node->nbAdj=0;
+	node->nbProducts=0;
 
 	node->X = X;
 	node->Y = Y;
@@ -112,6 +98,7 @@ struct Node *getNodeIntermediate(int aisle, int boolTopBottom)
 		}
 	return NULL;
 }
+
 
 void createLink(struct Node *node1, struct Node *node2) 
 {
@@ -209,6 +196,72 @@ void freeGraph(struct Graph *graph) {
     free(graph);
 }
 
+
+
+
+// catalogue
+
+Article* remplir_catalogue(char* nom_fichier) {
+    FILE* fichier = fopen(nom_fichier, "r");
+    if (fichier == NULL) {
+        printf("Impossible d'ouvrir le fichier %s\n", nom_fichier);
+        exit(1);
+    }
+
+    Article* articles = malloc(69 * sizeof(Article));
+    if (articles == NULL) {
+        printf("Impossible d'allouer de la mémoire\n");
+        exit(1);
+    }
+
+    char ligne[100];
+    int i = 0;
+	char *token;
+	while (fgets(ligne, 100, fichier) != NULL) {
+		token = strtok(ligne, " ");
+		articles[i].ref = atoi(token);
+		token = strtok(NULL, " ");
+		articles[i].nom = malloc(strlen(token) + 1);
+		strcpy(articles[i].nom, token);
+		token = strtok(NULL, " ");
+		articles[i].prix = atof(token);
+		token = strtok(NULL, " ");
+		articles[i].poids = atof(token);
+		token = strtok(NULL, " ");
+		articles[i].volume = atof(token);
+		token = strtok(NULL, " ");
+		articles[i].resistance = atof(token);
+		i++;
+	}
+    fclose(fichier);
+
+    return articles;
+}
+
+void print_catalogue(Article* articles) {
+	printf("\n\nCatalogue :\n\n");
+    printf("+------+--------------------------+------------+--------+--------+------------+\n");
+    printf("| Ref. | Nom                      |   Prix     |  Poids | Volume | Resistance |\n");
+    printf("+------+--------------------------+------------+--------+--------+------------+\n");
+    for (int i = 0; i < 69; i++) {
+        printf("| %4d | %-24s | %10.2f | %6.2f | %6.2f | %10.2f |\n",
+               articles[i].ref, articles[i].nom, articles[i].prix, articles[i].poids, articles[i].volume, articles[i].resistance);
+    }
+    printf("+------+--------------------------+------------+--------+--------+------------+\n");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 //representation graphique :
 
  
@@ -250,6 +303,10 @@ void display() {
 	struct Graph *SHOP;
 	SHOP = malloc(sizeof(struct Graph));
 	SHOP = FileRead("shop1.txt");
+	// catalogue
+	Article* articles = remplir_catalogue("catalogue.txt");
+	print_catalogue(articles);
+
 
 	
 	
@@ -318,3 +375,11 @@ int main(int argc, char **argv) {
 	glutMainLoop();
 	return 0;
 }
+
+
+
+
+
+
+
+
