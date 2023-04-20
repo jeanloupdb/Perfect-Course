@@ -8,19 +8,8 @@
 #include <math.h>
 #include "graph.h"
 
-  
-/*struct PlanStock
-{ 
-	int nbRangees;
-	int nbCasiers;
-	int produit[][];
-};*/
-
-
 
 struct Graph G;
-
-
 
 void printNode(struct Node *node)
 {
