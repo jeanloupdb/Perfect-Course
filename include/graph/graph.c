@@ -9,6 +9,7 @@
 #include "graph.h"
 
 
+
 struct Graph G;
 
 void printNode(struct Node *node)
