@@ -505,15 +505,15 @@ int main(int argc, char argv[])
 	for (int i = 0; i < 69; i++) {
 		panier[i] = -1;
 	}
-	panier[0] = 1;
-	panier[5] = 1;
-	panier[12] = 1;
-	panier[25] = 1;
-	panier[45] = 1;
-	panier[55] = 1;
-	panier[61] = 1;
-	panier[64] = 1;
-	panier[68] = 1;
+	panier[0] = 1; //  1 lait
+	panier[5] = 1; //  1 pain
+	panier[12] = 1; //  1 the_en_sachets
+	panier[25] = 1; //  1 haricots_blancs
+	panier[45] = 1;	//  1 oeufs_de_caille
+	panier[55] = 1; //  1 raisin
+	panier[61] = 1; //  1 carotte 
+	panier[64] = 1; //  1 oignon
+	panier[68] = 1; //  1 patate_douce
 	int nbart = 9;
 
 	int panierCopy[69];
