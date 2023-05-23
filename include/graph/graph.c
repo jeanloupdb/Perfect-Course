@@ -14,24 +14,38 @@ struct Graph G;
 
 void printNode(struct Node *node)
 {
-	if (node->boolShelf==0)
-	{
-		printf("[%d,", node->aisle);
-		if (node->boolTopBottom == 1)
-			printf("top");
-		else 
-			printf("bottom");
-		printf("]");
+	//boolShelf = 0 -> noeud extremite d'une etagere
+	//    boolTopBottom = 1 -> noeud du haut
+	//    sinon -> noeud du bas
+	//boolShelf = 1 -> noeud produit
+	//boolShelf = 2 -> noeud entree de l'entrepot
+
+	char *top = "top\0";
+	char *bottom = "bottom\0";
+	char *product = "product\0";
+	char *entry = "entry\0";
+	char *s;
+	if(node->boolShelf==0){
+		if(node->boolTopBottom==1)
+			s = top;
+		else
+			s = bottom;
 	}
+	else if(node->boolShelf==1)
+		s = product;
+	else
+		s = entry;
 
-	if (node->boolShelf==1)
-		printf("[%d,%d]", node->aisle, node->shelf);
-
-	if (node->boolShelf==2)
-		printf("debut");
-		
+	//|    Action   | NodeID  |  Type   | Rayon | Etagere | X,Y   | NbProducts |
+	printf("\n| create node | %6d  | %7s | %5d | %7d | %2d,%2d | %10d |", node->nodeID, s, node->aisle, node->shelf, node->X, node->Y, node->nbProducts);
 }
 
+void printLink(struct Node *node1, struct Node *node2)
+{
+	printf(" (%d to %d)", node1->nodeID, node2->nodeID);
+}
+
+// createNode cree un noeud
 struct Node *createNode(int boolShelf, int aisle, int shelf, int boolTopBottom, int X, int Y, int p1, int p2, int p3,  int print) 
 {
 	struct Node *node;
@@ -61,13 +75,12 @@ struct Node *createNode(int boolShelf, int aisle, int shelf, int boolTopBottom, 
 	G.order++;
 	
 	if (print == 1){
-		printf("create node: ");
 		printNode(node);
-		printf("(%d, %d) nb products: %d \n", node->X, node->Y, node->nbProducts);
 	}
 	return node;
 }
 
+// getNodeShelf(int aisle, int shelf)  retourne le noeud shelf correspondant a l'etage et a la colonne
 struct Node *getNodeShelf(int aisle, int shelf) 
 {
 	int i=0;
@@ -80,6 +93,8 @@ struct Node *getNodeShelf(int aisle, int shelf)
 	return NULL;
 }
 
+
+// getNodeIntermediate retourne le noeud intermediaire entre deux noeuds shelf
 struct Node *getNodeIntermediate(int aisle, int boolTopBottom)
 {
 	int i=0;
@@ -91,31 +106,42 @@ struct Node *getNodeIntermediate(int aisle, int boolTopBottom)
 	return NULL;
 }
 
-
+// createLink cree un lien entre deux noeuds
 void createLink(struct Node *node1, struct Node *node2,  int print) 
 {
 	if ((node1->nbAdj>=10)||(node2->nbAdj>=10))
 		errx(1,"link creation error");
-	node1->adjTab[node1->nbAdj]=node2;
-	node1->nbAdj++;
-	node2->adjTab[node2->nbAdj]=node1;
-	node2->nbAdj++;
 
-	if (print == 1)
-	{
-		printf("create link: (");
+	int ok = 1;
+	int i=0;
+	while ((i<node1->nbAdj) && (ok==1)) {
+		if (node1->adjTab[i]->nodeID==node2->nodeID)
+			ok=0;
+		i++;
+	}
+	if(ok==1){
+		i=0;
+		while ((i<node2->nbAdj) && (ok==1)) {
+			if (node2->adjTab[i]->nodeID==node1->nodeID)
+				ok=0;
+			i++;
+		}
+	}
+	if(ok==1){
+		node1->adjTab[node1->nbAdj]=node2;
+		node1->nbAdj++;
+		node2->adjTab[node2->nbAdj]=node1;
+		node2->nbAdj++;
 
-		printNode(node1);
-
-		printf(" - ");
-		printNode(node2);
-		
-		printf(")\n");
+		if (print == 1)
+		{
+			printLink(node1,node2);
+		}
 	}
 }
 
 // Creation du graphe representant le plan de stockage a partir d'un fichier
-// version avec des printf pour verifier le bon fonctionnement
+// print = 1 pour afficher les etapes de creation du graphe
 struct Graph *FileRead(char *filename , int print)
 {
 	FILE *file;
@@ -131,55 +157,66 @@ struct Graph *FileRead(char *filename , int print)
 	file = fopen(filename, "r");
 	if (file == NULL)
 		errx(1,"opening error");
-	
+
+	if(print == 1){
+		printf("+-------------+---------+---------+-------+---------+-------+------------+\n");
+		printf("|    Action   | NodeID  |  Type   | Rayon | Etagere | X,Y   | NbProducts |\n");
+		printf("|-------------|---------|---------|-------|---------|-------|------------|");        
+	}     
 	while((fgets(buffer,256,file) != NULL) && 
 			(sscanf(buffer,"aisle %d top(%d,%d) bottom(%d,%d", &aisle, &X1, &Y1, &X2, &Y2) == 5))
 	{
 
-		createNode(0,aisle,-1,1,X1,Y1,-1,-1,-1,  print); /*noeud top*/   // le dernier 1 pour print les resultats
+		createNode(0,aisle,-1,1,X1,Y1,-1,-1,-1,  print); /*noeud top*/   
 		while((fgets(buffer,256,file) != NULL ) && 
 				(sscanf(buffer, "%d(%d,%d) %d %d %d", &shelf, &X1, &Y1,&article_1, &article_2, &article_3) == 6))
 		{
 			/*printf("shelf: %d a1: %d a2: %d a3: %d \n",shelf,article_1,article_2,article_3);*/
-			createNode(1,aisle,shelf,-1,X1,Y1,article_1,article_2,article_3, print); /*noeud shelf*/  // le dernier 1 pour print les resultats
+			createNode(1,aisle,shelf,-1,X1,Y1,article_1,article_2,article_3, print); /*noeud shelf*/  
 			if ((shelf == 1) || (shelf == 2))
-				createLink(getNodeShelf(aisle,shelf),getNodeIntermediate(aisle,1),   print);   // le dernier 1 pour print les resultats
+				createLink(getNodeShelf(aisle,shelf),getNodeIntermediate(aisle,1),   print);   
 			else
-				createLink(getNodeShelf(aisle,shelf),getNodeShelf(aisle,shelf-2),   print);   // le dernier 1 pour print les resultats
+				createLink(getNodeShelf(aisle,shelf),getNodeShelf(aisle,shelf-2),   print);   
 		}
 		/*noeud bottom du dernier rayon*/
-		createNode(0,aisle,-1,0,X2,Y2,-1,-1,-1,   print);   // le dernier 1 pour print les resultats
-		createLink(getNodeIntermediate(aisle,0),getNodeShelf(aisle,shelf)  , print);   // le dernier 1 pour print les resultats
-		createLink(getNodeIntermediate(aisle,0),getNodeShelf(aisle,shelf-1) , print);   // le dernier 1 pour print les resultats
+		createNode(0,aisle,-1,0,X2,Y2,-1,-1,-1,   print);   
+		createLink(getNodeIntermediate(aisle,0),getNodeShelf(aisle,shelf)  , print);   
+		createLink(getNodeIntermediate(aisle,0),getNodeShelf(aisle,shelf-1) , print);   
 	}
 
-	while((fgets(buffer,256,file) != NULL) && (sscanf(buffer,"%d_%s %d_%s", &aisle_1, botop_1, &aisle_2, botop_2) == 4))
+
+	
+	//debut
+	while((fgets(buffer,256,file) != NULL) && (sscanf(buffer,"start(%d,%d)", &X1, &Y1) == 2))
+	{
+		debut=createNode(2,-1,-1,-1,X1,Y1,-1,-1,-1,print);   
+	}
+	 
+
+
+	while((fgets(buffer,256,file) != NULL) && ((sscanf(buffer,"%d_%s %d_%s", &aisle_1, botop_1, &aisle_2, botop_2) == 4) 
+			|| (sscanf(buffer,"%s %d_%s", botop_1, &aisle_2, botop_2) == 3)))
 	{	
 		if ((strcmp(botop_1,"top") == 0) && (strcmp(botop_2,"top") == 0))
-			createLink(getNodeIntermediate(aisle_1,1),getNodeIntermediate(aisle_2,1) ,   print);   // le dernier 1 pour print les resultats
+			createLink(getNodeIntermediate(aisle_1,1),getNodeIntermediate(aisle_2,1) ,   print);   
 		if ((strcmp(botop_1,"bottom") == 0) && (strcmp(botop_2,"top") == 0))
-			createLink(getNodeIntermediate(aisle_1,0),getNodeIntermediate(aisle_2,1)  ,   print);   // le dernier 1 pour print les resultats
+			createLink(getNodeIntermediate(aisle_1,0),getNodeIntermediate(aisle_2,1)  ,   print);   
 		if ((strcmp(botop_1,"top") == 0) && (strcmp(botop_2,"bottom") == 0))
-			createLink(getNodeIntermediate(aisle_1,1),getNodeIntermediate(aisle_2,0)  ,   print);   // le dernier 1 pour print les resultats
+			createLink(getNodeIntermediate(aisle_1,1),getNodeIntermediate(aisle_2,0)  ,   print);   
 		if ((strcmp(botop_1,"bottom") == 0) && (strcmp(botop_2,"bottom") == 0))
-			createLink(getNodeIntermediate(aisle_1,0),getNodeIntermediate(aisle_2,0)  ,   print);   // le dernier 1 pour print les resultats
-		/*printf("%d%s - %d%s \n", aisle_1, botop_1, aisle_2, botop_2);*/
-		/* lien entre noeud top/bottom du rayon 1 et le noeud top/bottom du rayon 2*/
+			createLink(getNodeIntermediate(aisle_1,0),getNodeIntermediate(aisle_2,0)  ,   print);
+		if(strcmp(botop_1,"start") == 0 && strcmp(botop_2,"top") == 0)
+			createLink(debut,getNodeIntermediate(aisle_2,1)  ,   print);   /* lien entre le noeud start et le noeud top du rayon 2*/
+		if(strcmp(botop_1,"start") == 0 && strcmp(botop_2,"bottom") == 0)
+			createLink(debut,getNodeIntermediate(aisle_2,0)  ,   print);   /* lien entre le noeud start et le noeud bottom du rayon 2*/
 	}
 
-	if (sscanf(buffer, "debut(%d,%d) %d_%s", &X1, &Y1, &aisle_1, botop_1) != 4)
-		errx(1, "scanning error 5");
-	/*printf("debut - %d_%s \n", aisle_1, botop_1);*/
-
-	debut = createNode(2,-1,-1,-1, X1, Y1, -1, -1, -1, print); // le dernier 1 pour print les resultats
-	if (strcmp(botop_1,"top") == 0)
-		createLink(debut,getNodeIntermediate(aisle_1,1)  ,   print);   // le dernier 1 pour print les resultats
 	
-	if (strcmp(botop_1,"bottom") == 0)
-		createLink(debut,getNodeIntermediate(aisle_1,0)  ,   print);   // le dernier 1 pour print les resultats
-	
-	/* créer le noeud debut et le relier au noeud top/bottom du rayon*/
 	fclose(file);
+
+	if(print == 1)
+		printf("\n+-------------+---------+---------+-------+---------+-------+------------+\n");
+
 	return &G;
 }
 
@@ -190,7 +227,7 @@ struct Graph *FileRead(char *filename , int print)
 
 
 
-
+// poids entre deux noeuds selon la distance euclidienne
 int poids(struct Graph *graph, int nd1, int nd2) 
 {
 	int x1, y1, x2, y2;
@@ -251,21 +288,12 @@ void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman tab[])
 }
 
 // fonction print bellman
-void printBellman(struct eltBellman tab[] , struct Graph *graph)
+void printBellman(struct eltBellman tab[] , int order)
 {
-	printf("\n\nprint bellman\n\n");
-    int i=0;
-    int path[512];
-    int nbPathNodes;
-
-    int sourceNode;
-    int targetNode;
-
-    sourceNode=graph->order-1; /* debut */
-
-    while (i<graph->order) 
+	int i=0;
+    while (i<order) 
     {
-        printf("node%d: distance=%d, precedent:%d\n",i,tab[i].distance,tab[i].precedentNode);
+        printf("nodeID: %d, dist: %d, prec: %d\n",i,tab[i].distance,tab[i].precedentNode);
         i++;
 	}
 
@@ -487,11 +515,12 @@ int main(int argc, char argv[])
     algoBellman(G, 38, tab);
 
 	printf("\n\nprint bellman(38)\n");
-    while (i<G->order) 
-    {
-        printf("node%d: distance=%d, precedent:%d\n",i,tab[i].distance,tab[i].precedentNode);
-        i++;
-    }
+    // while (i<G->order) 
+    // {
+    //     printf("node%d: distance=%d, precedent:%d\n",i,tab[i].distance,tab[i].precedentNode);
+    //     i++;
+    // }
+	printBellman(tab, G->order);
 
     pathToTarget(tab, 38, 12, path, &nbPathNodes);
     printPathToTarget(G, path, nbPathNodes, 38, 12);
@@ -512,7 +541,7 @@ int main(int argc, char argv[])
 	panier[45] = 1;	//  1 oeufs_de_caille
 	panier[55] = 1; //  1 raisin
 	panier[61] = 1; //  1 carotte 
-	panier[64] = 1; //  1 oignon
+	panier[64] = 3; //  1 oignon
 	panier[68] = 1; //  1 patate_douce
 	int nbart = 9;
 

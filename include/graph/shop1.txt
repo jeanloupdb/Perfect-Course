@@ -36,7 +36,9 @@ aisle 5 top(10,3) bottom(15,3)
 07(14,4) 63 64 65
 08(14,2) 66 67 68
 
-aisle links:
+Entry:
+start(9,0)
+
 1_bottom 2_bottom
 1_top 2_top
 1_bottom 3_top
@@ -45,4 +47,4 @@ aisle links:
 3_top 2_bottom
 4_top 2_bottom
 4_top 5_top
-debut(9, 0) 5_top
+start 5_top

@@ -12,18 +12,20 @@ struct Graph
     struct Node *tableNodes[512];
 };
 
+
+// Node: structure d'un noeud, contient les informations sur une etagere ou un noeud intermediaire
 struct Node
 {
-    int nodeID;
-    int boolShelf;
-    int aisle;
-    int shelf;
-    int boolTopBottom;
-    struct Node *adjTab[10];
-    int nbAdj;
-    int X;
-    int Y;
-    int productsTab[3];
+    int nodeID; // Identifiant du noeud
+    int boolShelf; // 0 si noeud extremite d'une etagere, 1 si noeud produit, 2 si noeud entree de l'entrepot
+    int aisle; 
+    int shelf; 
+    int boolTopBottom; // 0 si noeud intermediaire, 1 si noeud du haut, 2 si noeud du bas
+    struct Node *adjTab[10]; // Tableau contenant les noeuds adjacents
+    int nbAdj; // Nombre de noeuds adjacents
+    int X; // Coordonnees du noeud
+    int Y; // Coordonnees du noeud
+    int productsTab[3]; // Tableau contenant les references des produits du noeud
     int nbProducts;
 };
 
@@ -56,6 +58,6 @@ int ref_to_node(struct Graph *G, int ref);
 void print_catalogue(Article* catalogue);
 int main_openGL() ;
 void reshape(int w, int h);
-    void init();
+void init();
 
 #endif // __GRAPH_H__
