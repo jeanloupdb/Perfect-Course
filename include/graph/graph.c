@@ -37,7 +37,7 @@ void printNode(struct Node *node)
 		s = entry;
 
 	//|    Action   | NodeID  |  Type   | Rayon | Etagere | X,Y   | NbProducts |
-	printf("\n| create node | %6d  | %7s | %5d | %7d | %2d,%2d | %10d |", node->nodeID, s, node->aisle, node->shelf, node->X, node->Y, node->nbProducts);
+	printf("\n| create node | %6d  | %7s | %5d | %7d | %2d,%2d | %10d |", node->nodeID, s, node->department, node->shelf, node->X, node->Y, node->nbProducts);
 }
 
 void printLink(struct Node *node1, struct Node *node2)
@@ -45,14 +45,14 @@ void printLink(struct Node *node1, struct Node *node2)
 	printf(" (%d to %d)", node1->nodeID, node2->nodeID);
 }
 
-// createNode cree un noeud
-struct Node *createNode(int boolShelf, int aisle, int shelf, int boolTopBottom, int X, int Y, int p1, int p2, int p3,  int print) 
+
+struct Node *createNode(int boolShelf, int department, int shelf, int boolTopBottom, int X, int Y, int p1, int p2, int p3,  int print) 
 {
 	struct Node *node;
 	node=malloc(sizeof(struct Node));
 	node->nodeID=G.order;
 	node->boolShelf=boolShelf;
-	node->aisle=aisle;
+	node->department=department;
 	node->shelf=shelf;
 	node->boolTopBottom=boolTopBottom;
 	node->nbAdj=0;
@@ -80,13 +80,12 @@ struct Node *createNode(int boolShelf, int aisle, int shelf, int boolTopBottom, 
 	return node;
 }
 
-// getNodeShelf(int aisle, int shelf)  retourne le noeud shelf correspondant a l'etage et a la colonne
-struct Node *getNodeShelf(int aisle, int shelf) 
+struct Node *getNodeShelf(int department, int shelf) 
 {
 	int i=0;
 	while (i<G.order) 
 	{
-		if ((aisle==G.tableNodes[i]->aisle) && (shelf==G.tableNodes[i]->shelf))
+		if ((department==G.tableNodes[i]->department) && (shelf==G.tableNodes[i]->shelf))
 			return G.tableNodes[i];
 		i++;
 	}
@@ -94,12 +93,11 @@ struct Node *getNodeShelf(int aisle, int shelf)
 }
 
 
-// getNodeIntermediate retourne le noeud intermediaire entre deux noeuds shelf
-struct Node *getNodeIntermediate(int aisle, int boolTopBottom)
+struct Node *getNodeIntermediate(int department, int boolTopBottom)
 {
 	int i=0;
 	while (i<G.order) {
-		if ((aisle==G.tableNodes[i]->aisle) && (boolTopBottom==G.tableNodes[i]->boolTopBottom))
+		if ((department==G.tableNodes[i]->department) && (boolTopBottom==G.tableNodes[i]->boolTopBottom))
 			return G.tableNodes[i];
 		i++;
 		}
@@ -146,9 +144,9 @@ struct Graph *FileRead(char *filename , int print)
 {
 	FILE *file;
 	char buffer[256];
-	int aisle;int shelf;
+	int department;int shelf;
 	int article_1;int article_2;int article_3;
-	int aisle_1;int aisle_2;
+	int department_1;int department_2;
 	char botop_1[50];char botop_2[50];
 	struct Node *debut;
 	int X1; int Y1; int X2; int Y2;
@@ -164,58 +162,58 @@ struct Graph *FileRead(char *filename , int print)
 		printf("|-------------|---------|---------|-------|---------|-------|------------|");        
 	}     
 	while((fgets(buffer,256,file) != NULL) && 
-			(sscanf(buffer,"aisle %d top(%d,%d) bottom(%d,%d", &aisle, &X1, &Y1, &X2, &Y2) == 5))
+			(sscanf(buffer,"department %d top(%d,%d) bottom(%d,%d", &department, &X1, &Y1, &X2, &Y2) == 5))
 	{
 
-		createNode(0,aisle,-1,1,X1,Y1,-1,-1,-1,  print); /*noeud top*/   
+		createNode(0,department,-1,1,X1,Y1,-1,-1,-1,  print); /*noeud top*/   
 		while((fgets(buffer,256,file) != NULL ) && 
 				(sscanf(buffer, "%d(%d,%d) %d %d %d", &shelf, &X1, &Y1,&article_1, &article_2, &article_3) == 6))
 		{
 			/*printf("shelf: %d a1: %d a2: %d a3: %d \n",shelf,article_1,article_2,article_3);*/
-			createNode(1,aisle,shelf,-1,X1,Y1,article_1,article_2,article_3, print); /*noeud shelf*/  
+			createNode(1,department,shelf,-1,X1,Y1,article_1,article_2,article_3, print); /*noeud shelf*/  
 			if ((shelf == 1) || (shelf == 2))
-				createLink(getNodeShelf(aisle,shelf),getNodeIntermediate(aisle,1),   print);   
+				createLink(getNodeShelf(department,shelf),getNodeIntermediate(department,1),   print);   
 			else
-				createLink(getNodeShelf(aisle,shelf),getNodeShelf(aisle,shelf-2),   print);   
+				createLink(getNodeShelf(department,shelf),getNodeShelf(department,shelf-2),   print);   
 		}
 		/*noeud bottom du dernier rayon*/
-		createNode(0,aisle,-1,0,X2,Y2,-1,-1,-1,   print);   
-		createLink(getNodeIntermediate(aisle,0),getNodeShelf(aisle,shelf)  , print);   
-		createLink(getNodeIntermediate(aisle,0),getNodeShelf(aisle,shelf-1) , print);   
+		createNode(0,department,-1,0,X2,Y2,-1,-1,-1,   print);   
+		createLink(getNodeIntermediate(department,0),getNodeShelf(department,shelf)  , print);   
+		createLink(getNodeIntermediate(department,0),getNodeShelf(department,shelf-1) , print);   
 	}
 
 
-	
 	//debut
 	while((fgets(buffer,256,file) != NULL) && (sscanf(buffer,"start(%d,%d)", &X1, &Y1) == 2))
 	{
 		debut=createNode(2,-1,-1,-1,X1,Y1,-1,-1,-1,print);   
 	}
 	 
+	if(print == 1)
+		printf("\n+-------------+---------+---------+-------+---------+-------+------------+");
+	
 
-
-	while((fgets(buffer,256,file) != NULL) && ((sscanf(buffer,"%d_%s %d_%s", &aisle_1, botop_1, &aisle_2, botop_2) == 4) 
-			|| (sscanf(buffer,"%s %d_%s", botop_1, &aisle_2, botop_2) == 3)))
+	while((fgets(buffer,256,file) != NULL) && ((sscanf(buffer,"%d_%s %d_%s", &department_1, botop_1, &department_2, botop_2) == 4) 
+			|| (sscanf(buffer,"%s %d_%s", botop_1, &department_2, botop_2) == 3)))
 	{	
 		if ((strcmp(botop_1,"top") == 0) && (strcmp(botop_2,"top") == 0))
-			createLink(getNodeIntermediate(aisle_1,1),getNodeIntermediate(aisle_2,1) ,   print);   
+			createLink(getNodeIntermediate(department_1,1),getNodeIntermediate(department_2,1) ,   print);   
 		if ((strcmp(botop_1,"bottom") == 0) && (strcmp(botop_2,"top") == 0))
-			createLink(getNodeIntermediate(aisle_1,0),getNodeIntermediate(aisle_2,1)  ,   print);   
+			createLink(getNodeIntermediate(department_1,0),getNodeIntermediate(department_2,1)  ,   print);   
 		if ((strcmp(botop_1,"top") == 0) && (strcmp(botop_2,"bottom") == 0))
-			createLink(getNodeIntermediate(aisle_1,1),getNodeIntermediate(aisle_2,0)  ,   print);   
+			createLink(getNodeIntermediate(department_1,1),getNodeIntermediate(department_2,0)  ,   print);   
 		if ((strcmp(botop_1,"bottom") == 0) && (strcmp(botop_2,"bottom") == 0))
-			createLink(getNodeIntermediate(aisle_1,0),getNodeIntermediate(aisle_2,0)  ,   print);
+			createLink(getNodeIntermediate(department_1,0),getNodeIntermediate(department_2,0)  ,   print);
 		if(strcmp(botop_1,"start") == 0 && strcmp(botop_2,"top") == 0)
-			createLink(debut,getNodeIntermediate(aisle_2,1)  ,   print);   /* lien entre le noeud start et le noeud top du rayon 2*/
+			createLink(debut,getNodeIntermediate(department_2,1)  ,   print);   /* lien entre le noeud start et le noeud top du rayon 2*/
 		if(strcmp(botop_1,"start") == 0 && strcmp(botop_2,"bottom") == 0)
-			createLink(debut,getNodeIntermediate(aisle_2,0)  ,   print);   /* lien entre le noeud start et le noeud bottom du rayon 2*/
+			createLink(debut,getNodeIntermediate(department_2,0)  ,   print);   /* lien entre le noeud start et le noeud bottom du rayon 2*/
 	}
 
 	
 	fclose(file);
 
-	if(print == 1)
-		printf("\n+-------------+---------+---------+-------+---------+-------+------------+\n");
+	
 
 	return &G;
 }
@@ -228,7 +226,7 @@ struct Graph *FileRead(char *filename , int print)
 
 
 // poids entre deux noeuds selon la distance euclidienne
-int poids(struct Graph *graph, int nd1, int nd2) 
+int distance(struct Graph *graph, int nd1, int nd2) 
 {
 	int x1, y1, x2, y2;
 	x1=graph->tableNodes[nd1]->X;
@@ -240,8 +238,7 @@ int poids(struct Graph *graph, int nd1, int nd2)
 }
 
 
-// Algorithme de Bellman retourne le tableau des distances et des prédécesseurs
-void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman tab[]) 
+void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman tab[], int *panier) 
 {
 	int i=0;
 	while (i<graph->order)
@@ -271,7 +268,7 @@ void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman tab[])
 				while (rgAdj<graph->tableNodes[N]->nbAdj)
 				{
 					int P = graph->tableNodes[N]->adjTab[rgAdj]->nodeID;
-					int poidsArc= (int)poids(graph,N,P);
+					int poidsArc= (int)distance(graph,N,P);
 					if (tab[N].distance > tab[P].distance+poidsArc)
 					{
 						tab[N].distance=tab[P].distance+poidsArc;
@@ -286,8 +283,6 @@ void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman tab[])
 		i++;
 	}
 }
-
-// fonction print bellman
 void printBellman(struct eltBellman tab[] , int order)
 {
 	int i=0;
@@ -338,7 +333,7 @@ void pathToTarget(struct eltBellman tabBellman[], int sourceNode, int targetNode
 // 	while (i<nbPathNodes)
 // 		{
 // 			int node=pathToTarget[i];
-// 			printf("->Id%d[%d,%d](%d,%d,%d)",node,graph->tableNodes[node]->aisle,graph->tableNodes[node]->shelf,
+// 			printf("->Id%d[%d,%d](%d,%d,%d)",node,graph->tableNodes[node]->department,graph->tableNodes[node]->shelf,
 // 				graph->tableNodes[node]->productsTab[0],
 // 				graph->tableNodes[node]->productsTab[1],
 // 				graph->tableNodes[node]->productsTab[2]);
@@ -348,7 +343,8 @@ void pathToTarget(struct eltBellman tabBellman[], int sourceNode, int targetNode
 // 	printf("\n");
 // }
 
-// different path to target 2
+
+
 
 void printPathToTarget(struct Graph *graph, int pathToTarget[], int nbPathNodes, int sourceNode, int targetNode)
 {
@@ -359,6 +355,7 @@ void printPathToTarget(struct Graph *graph, int pathToTarget[], int nbPathNodes,
 	}
 
 }
+
 
 void print_panier(struct Graph *graph, int panier[], Article catalogue[])
 {
@@ -377,7 +374,6 @@ void print_panier(struct Graph *graph, int panier[], Article catalogue[])
     printf("+------+----------------------------+-----------+-------------+\n");
 }
 
-// transforme la ref en nodes
 int ref_to_node(struct Graph *G, int ref)
 {
 	int res = -1;
@@ -388,63 +384,153 @@ int ref_to_node(struct Graph *G, int ref)
 	return res;
 }
 
+int compareArticles(const void *a, const void *b)
+{
+    const Article *articleA = (const Article *)a;
+    const Article *articleB = (const Article *)b;
+
+    // Facteurs de pondération pour les différents paramètres
+    double poidsFactor = 1.0;
+    double resistanceFactor = 0.8;
+    double volumeFactor = 0.6;
+    double fragiliteFactor = 0.4;
+
+    // Formule personnalisée reliant les paramètres avec des facteurs de pondération
+    double scoreA = poidsFactor * articleA->poids +
+                    resistanceFactor * articleA->resistance +
+                    volumeFactor * articleA->volume +
+                    fragiliteFactor * articleA->resistance;
+
+    double scoreB = poidsFactor * articleB->poids +
+                    resistanceFactor * articleB->resistance +
+                    volumeFactor * articleB->volume +
+                    fragiliteFactor * articleB->resistance;
+
+    if (scoreA > scoreB)
+        return 1;
+    else if (scoreA < scoreB)
+        return -1;
+    else
+        return 0;
+}
+
+
+
 // fonction qui trouve le plus court chemin dans les noueds du panier
 // panier : int [69] avec panier[i] > 0 si l'article i est dans le panier
 // renvoie le chemin sous forme d'un tableau de nodes
 //plus_court_chemin(G, panier, catalogue, sourceNode, tab, path);
+// void plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int nbart)
+// {
+// 	int nbPathNodes;
+// 	int targetNode;
+// 	int nbNodes = 0;
+// 	int nodes[nbart];
+// 	int path[512];
+// 	int countPath = 0;
+// 	// on récupère les nodes du panier
+// 	for(int i = 0; i < 69; i++) {
+// 		if(panier[i] != -1) {
+// 			nodes[nbNodes] = ref_to_node(graph, i);
+// 			nbNodes++;
+// 		}
+// 	}
+
+// 	int bool = 0;
+// 	while(!bool){
+// 		algoBellman(graph, sourceNode, tab, panier);
+// 		int test = 0;
+// 		for (int k = 0; k < nbart; k++)
+// 		{
+// 			test += (nodes[k] != -1);
+// 		}
+// 		bool = test == 0;
+// 		// on trouve le noeud de nodes[] le plus proche de sourceNode
+// 		int min = 100000;
+		
+// 		int i = 0;
+// 		int i_min = 0;
+// 		while(i < nbart) {
+// 			if(tab[nodes[i]].distance < min && nodes[i] != -1) {
+// 				min = tab[nodes[i]].distance;
+// 				targetNode = nodes[i];
+// 				i_min = i;
+// 			}
+// 			i++;
+// 		}
+// 		nodes[i_min] = -1;
+
+// 		// on trouve le chemin
+// 		pathToTarget(tab, sourceNode, targetNode, path, &nbPathNodes);
+// 		// on affiche le chemin
+// 		printPathToTarget(graph, path, nbPathNodes, sourceNode, targetNode);
+// 		for(int i = 0; i < nbPathNodes; i++) {
+// 			path2[countPath] = path[i];
+// 			countPath++;
+// 		}
+// 		sourceNode = targetNode;
+// 	}
+	
+// }
 
 void plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int nbart)
 {
-	int nbPathNodes;
-	int targetNode;
-	int nbNodes = 0;
-	int nodes[nbart];
-	int path[512];
-	int countPath = 0;
-	// on récupère les nodes du panier
-	for(int i = 0; i < 69; i++) {
-		if(panier[i] != -1) {
-			nodes[nbNodes] = ref_to_node(graph, i);
-			nbNodes++;
-		}
-	}
-
-	int bool = 0;
-	while(!bool){
-		algoBellman(graph, sourceNode, tab);
-		int test = 0;
-		for (int k = 0; k < nbart; k++)
-		{
-			test += (nodes[k] != -1);
-		}
-		bool = test == 0;
-		// on trouve le noeud de nodes[] le plus proche de sourceNode
-		int min = 100000;
-		
-		int i = 0;
-		int i_min = 0;
-		while(i < nbart) {
-			if(tab[nodes[i]].distance < min && nodes[i] != -1) {
-				min = tab[nodes[i]].distance;
-				targetNode = nodes[i];
-				i_min = i;
-			}
-			i++;
-		}
-		nodes[i_min] = -1;
-
-		// on trouve le chemin
-		pathToTarget(tab, sourceNode, targetNode, path, &nbPathNodes);
-		// on affiche le chemin
-		printPathToTarget(graph, path, nbPathNodes, sourceNode, targetNode);
-		for(int i = 0; i < nbPathNodes; i++) {
-			path2[countPath] = path[i];
-			countPath++;
-		}
-		sourceNode = targetNode;
-	}
-	
+    int nbPathNodes;
+    int targetNode;
+    int nbNodes = 0;
+    int nodes[nbart];
+    int path[512];
+    int countPath = 0;
+    
+    // On récupère les nodes du panier
+    for (int i = 0; i < 69; i++) {
+        if (panier[i] != -1) {
+            nodes[nbNodes] = ref_to_node(graph, i);
+            nbNodes++;
+        }
+    }
+    
+    int bool = 0;
+	int test = 0;
+    while (!bool && test < 5) {
+		test++;
+        algoBellman(graph, sourceNode, tab, panier);
+        int test = 0;
+        for (int k = 0; k < nbart; k++) {
+            test += (nodes[k] != -1);
+        }
+        bool = test == 0;
+        
+        // On trouve le noeud de nodes[] le plus proche de sourceNode en utilisant la fonction compareArticles
+        int min = 100000;
+        int i_min = 0;
+        for (int i = 0; i < nbart; i++) {
+            if (nodes[i] != -1) {
+                if (compareArticles(&catalogue[sourceNode], &catalogue[nodes[i]]) > 0) {
+                    min = tab[nodes[i]].distance;
+                    targetNode = nodes[i];
+                    i_min = i;
+                }
+            }
+        }
+        nodes[i_min] = -1;
+        
+        // On trouve le chemin
+        pathToTarget(tab, sourceNode, targetNode, path, &nbPathNodes);
+        
+        // On affiche le chemin
+        printPathToTarget(graph, path, nbPathNodes, sourceNode, targetNode);
+        
+        // On ajoute le chemin au tableau path2
+        for (int i = 0; i < nbPathNodes; i++) {
+            path2[countPath] = path[i];
+            countPath++;
+        }
+        
+        sourceNode = targetNode;
+    }
 }
+
 
 void print_path(struct Graph *graph, int path[], int panier[], struct Article catalogue[])
 {
@@ -512,18 +598,7 @@ int main(int argc, char argv[])
 	// sourceNode=45;
     // targetNode=55;
 
-    algoBellman(G, 38, tab);
-
-	printf("\n\nprint bellman(38)\n");
-    // while (i<G->order) 
-    // {
-    //     printf("node%d: distance=%d, precedent:%d\n",i,tab[i].distance,tab[i].precedentNode);
-    //     i++;
-    // }
-	printBellman(tab, G->order);
-
-    pathToTarget(tab, 38, 12, path, &nbPathNodes);
-    printPathToTarget(G, path, nbPathNodes, 38, 12);
+    
 
 	Article* catalogue = remplir_catalogue("catalogue.txt");
 	print_catalogue(catalogue);
@@ -552,6 +627,19 @@ int main(int argc, char argv[])
 
 	print_panier(G, panierCopy, catalogue);
 
+
+	algoBellman(G, 38, tab, panier);
+
+	printf("\n\nprint bellman(38)\n");
+    // while (i<G->order) 
+    // {
+    //     printf("node%d: distance=%d, precedent:%d\n",i,tab[i].distance,tab[i].precedentNode);
+    //     i++;
+    // }
+	printBellman(tab, G->order);
+
+    pathToTarget(tab, 38, 12, path, &nbPathNodes);
+    printPathToTarget(G, path, nbPathNodes, 38, 12);
 	
 	plus_court_chemin(G, panierCopy, catalogue, 38, tab, path, nbart);
 
