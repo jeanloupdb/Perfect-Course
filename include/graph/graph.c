@@ -614,7 +614,7 @@ int creer_chemin(struct Graph *G, int path[], int panier[], struct Article catal
     pathToTarget(tab, 38, 12, path, &nbPathNodes);
     printPathToTarget(path, nbPathNodes, 38, 12, print);
 	
-	plus_court_chemin(G, panierCopy, catalogue, 38, tab, path, nbart, print);
+	plus_court_chemin(G, panier, catalogue, 38, tab, path, nbart, print);
 
 	print_path(G, path, panier, catalogue, print);
 
@@ -706,11 +706,6 @@ void print_catalogue(Article* catalogue, int print) {
 
 
 
-
-
-
-
-
 //representation graphique :
 
  
@@ -726,7 +721,7 @@ void print_catalogue(Article* catalogue, int print) {
 
 
 
-void drawSquare(int x, int y, int size) {
+void drawSquare(int x, int y, int size, int bool_panier) {
     size = size *1.4; // Demi-taille du carré
 
     glBegin(GL_QUADS);
@@ -737,8 +732,14 @@ void drawSquare(int x, int y, int size) {
     glVertex2i(x - size, y + size);
     glEnd();
 
-    glLineWidth(1.0); // Épaisseur du contour
-    glColor3f(0.0f, 0.0f, 0.0f); // Noir
+
+	if (bool_panier) {
+		glLineWidth(2.0); // Épaisseur du contour
+		glColor3f(0.0f, 1.0f, 0.0f); // Vert
+	} else {
+		glLineWidth(2.0); // Épaisseur du contour
+		glColor3f(0.0f, 0.0f, 0.0f); // Noir
+	}
     glBegin(GL_LINE_LOOP);
     glVertex2i(x - size, y - size);
     glVertex2i(x + size, y - size);
@@ -756,6 +757,46 @@ void drawLine(int x1, int y1, int x2, int y2) {
 	glEnd();
 }
 
+void drawArrow(int x1, int y1, int x2, int y2) {
+    // Calculer la longueur et l'angle du trait
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    float length = sqrt(dx * dx + dy * dy);
+    float angle = atan2(dy, dx);
+
+    // Calculer les coordonnées des extrémités de la flèche
+    float arrowLength = 15 * SIZE_OF_GRAPH; // Longueur de la flèche (10% de la longueur du trait)
+    float arrowAngle = 0.5; // Angle d'ouverture de la flèche (0.5 radian)
+
+    // Calculer les coordonnées du centre du trait
+    float centerX = (x1 + x2) / 2.0;
+    float centerY = (y1 + y2) / 2.0;
+
+    // Calculer les coordonnées de la pointe de la flèche
+    float arrowX = centerX - arrowLength * cos(angle); 
+    float arrowY = centerY - arrowLength * sin(angle); 
+
+    // Calculer les coordonnées des deux extrémités de la base de la flèche
+    float arrowX1 = arrowX + arrowLength * cos(angle + arrowAngle);
+    float arrowY1 = arrowY + arrowLength * sin(angle + arrowAngle);
+    float arrowX2 = arrowX + arrowLength * cos(angle - arrowAngle);
+    float arrowY2 = arrowY + arrowLength * sin(angle - arrowAngle);
+
+    // Dessiner le trait
+    glBegin(GL_LINES);
+    glVertex2i(x1, y1);
+    glVertex2i(x2, y2);
+    glEnd();
+
+    // Dessiner la flèche
+    glBegin(GL_TRIANGLES);
+    glVertex2f(arrowX, arrowY);
+    glVertex2f(arrowX1, arrowY1);
+    glVertex2f(arrowX2, arrowY2);
+    glEnd();
+}
+
+
 // Fonction d'affichage
 void display() { 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -765,10 +806,17 @@ void display() {
 	int panier[69]; 
 	struct Article *catalogue; 
 
-    struct eltBellman tab[512]; 
+    struct eltBellman tab[512];
 	// remplir le panier, le catalogue, le tableau de Bellman et chemin (path[]) :
 	creer_chemin(G, path, panier, catalogue, tab, 1);
 
+	// tableau de marquage des couples de noeuds déjà reliés par un trait orange
+	int tab_marquage[512][512];
+	for (int i = 0; i < 512; i++) {
+		for (int j = 0; j < 512; j++) {
+			tab_marquage[i][j] = 0;
+		}
+	}
 	
 	float scale = SIZE_OF_GRAPH;
 	// Dessiner les traits pour les liens
@@ -782,14 +830,29 @@ void display() {
 			// si node->nodeID et adjNode->nodeID se suivent dans le tableau path[] :
 			// faire le trait en orange
 			int bool_chemin = 0;
+			int bool_arrow = 0;
 			int k = 0;
-			while (path[k] != -1 && !bool_chemin && k < 512) {
-				if ((path[k] == node->nodeID && path[k+1] == adjNode->nodeID) || (path[k] == adjNode->nodeID && path[k+1] == node->nodeID)) {
+			float X1 = node->X * 50 * scale;
+			float Y1 = node->Y * 40 * scale;
+			float X2 = adjNode->X * 50 * scale;
+			float Y2 = adjNode->Y * 40 * scale;
+
+			while (path[k+1] != -1 && !bool_chemin && k < 511) {
+				if ((path[k] == node->nodeID && path[k+1] == adjNode->nodeID)  && tab_marquage[node->nodeID][adjNode->nodeID] == 0) {
+					bool_arrow = 1;
+					tab_marquage[node->nodeID][adjNode->nodeID] = 1;
+					tab_marquage[adjNode->nodeID][node->nodeID] = 1;
+				}
+				if((path[k] == adjNode->nodeID && path[k+1] == node->nodeID) || (path[k] == node->nodeID && path[k+1] == adjNode->nodeID)) {
 					bool_chemin = 1;
 				}
 				k++;
 			}
-			if (bool_chemin) {
+			if (bool_arrow) {
+				glColor3f(1.0, 0.5, 0.0); 
+                // Afficher la flèche
+				drawArrow(X1, Y1, X2, Y2);
+			}else if (bool_chemin) {
 				// Modifier l'épaisseur de la ligne
 				glLineWidth(5);
 				// orange pour le chemin
@@ -798,7 +861,6 @@ void display() {
 			else{
 				// Si lien entre rayons
 				if ((adjNode->boolShelf == 0 && node->boolShelf == 0) || (adjNode->boolShelf == 2 && node->boolShelf == 0) || (adjNode->boolShelf == 0 && node->boolShelf == 2)) {
-					
 					// Modifier l'épaisseur de la ligne
 						glLineWidth(2);
 					// gris pour les liens entre rayons
@@ -810,7 +872,7 @@ void display() {
 					glColor3f(0.0, 0.0, 0.0); 
 				}
 			}
-			drawLine(node->X * 50 * scale, node->Y * 40 * scale, adjNode->X * 50 * scale, adjNode->Y * 40 * scale);
+			drawLine(X1, Y1, X2, Y2);
 		}
 	}
 
@@ -821,7 +883,21 @@ void display() {
 		struct Node *node = G->tableNodes[i];
 		int x = node->X * 50 * scale;
 		int y = node->Y * 40 * scale;
-	    drawSquare(x, y, size);
+
+		// le noeud est il dans le panier ?
+		int r = 0;
+		int bool_panier = 0;
+		int somme = 0;
+		while (r<3) {
+			if (node->boolShelf == 1 && panier[node->productsTab[r]] != -1) {
+				somme += panier[node->productsTab[r]];
+			}
+			r++;
+		}
+		bool_panier = (somme > 0);
+
+		
+	    drawSquare(x, y, size, bool_panier);
 
 		// Afficher le numéro du nœud
 		glColor3f(0.0, 0.0, 0.0); // Blanc

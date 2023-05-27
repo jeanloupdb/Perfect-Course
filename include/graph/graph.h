@@ -5,11 +5,14 @@
 #include <err.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 
 // Constante de la taille de la fenêtre et du graph
 // 0.8 > SIZE_OF_GRAPH > 1.8
 #define SIZE_OF_GRAPH 1.8
+
+#define M_PI 3.14159265358979323846
 
 /**
  * Structure représentant un graphe.
@@ -18,7 +21,6 @@ struct Graph {
     int order;                   // Nombre de noeuds dans le graphe
     struct Node *tableNodes[512]; // Tableau contenant les noeuds du graphe
 };
-
 
 // Prototypes des fonctions
 
@@ -256,8 +258,9 @@ void print_catalogue(Article* catalogue, int print);
  * @param x     Coordonnée x du centre du carré.
  * @param y     Coordonnée y du centre du carré.
  * @param size  Taille du carré.
+ * @param bool_panier   Indique si le carré est un panier (1) ou non (0).
  */
-void drawSquare(int x, int y, int size);
+void drawSquare(int x, int y, int size, int bool_panier);
 
 /**
  * Dessine une ligne entre les coordonnées (x1, y1) et (x2, y2).
