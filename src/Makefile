@@ -13,4 +13,4 @@ graph.o: graph.c
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	rm -f *.o votre_executable
+	rm -f *.o executable

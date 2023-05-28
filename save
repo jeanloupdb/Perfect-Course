@@ -1,4 +1,4 @@
 git add --all
-git commit -m "projet complet non optimise"
+git commit -m "modif dossiers"
 git pull origin main
 git push origin main
