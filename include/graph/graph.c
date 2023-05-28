@@ -24,30 +24,24 @@ struct Graph *createGraph(int print)
 void printNode(struct Node *node, int print)
 {
 	if(print){
-	//boolShelf = 0 -> noeud extremite d'une etagere
-	//    boolTopBottom = 1 -> noeud du haut
-	//    sinon -> noeud du bas
-	//boolShelf = 1 -> noeud produit
-	//boolShelf = 2 -> noeud entree de l'entrepot
-
-	char *top = "top\0";
-	char *bottom = "bottom\0";
-	char *product = "product\0";
-	char *entry = "entry\0";
-	char *s;
-	if(node->boolShelf==0){
-		if(node->boolTopBottom==1)
-			s = top;
+		char *top = "top\0";
+		char *bottom = "bottom\0";
+		char *product = "product\0";
+		char *entry = "entry\0";
+		char *s;
+		if(node->boolShelf==0){
+			if(node->boolTopBottom==1)
+				s = top;
+			else
+				s = bottom;
+		}
+		else if(node->boolShelf==1)
+			s = product;
 		else
-			s = bottom;
-	}
-	else if(node->boolShelf==1)
-		s = product;
-	else
-		s = entry;
+			s = entry;
 
-	//|    Action   | NodeID  |  Type   | Rayon | Etagere | X,Y   | NbProducts |
-	printf("\n| create node | %6d  | %7s | %5d | %7d | %2d,%2d | %10d |", node->nodeID, s, node->department, node->shelf, node->X, node->Y, node->nbProducts);
+		//|    Action   | NodeID  |  Type   | Rayon | Etagere | X,Y   | NbProducts |
+		printf("\n| create node | %6d  | %7s | %5d | %7d | %2d,%2d | %10d |", node->nodeID, s, node->department, node->shelf, node->X, node->Y, node->nbProducts);
 	}
 }
 
@@ -55,6 +49,24 @@ void printLink(struct Node *node1, struct Node *node2, int print)
 {
 	if(print)
 		printf(" (%d to %d)", node1->nodeID, node2->nodeID);
+}
+
+int getNbArticles(char *filename)
+{
+	FILE *file;
+	char buffer[256];
+	int nbArticles = 0;
+
+	file = fopen(filename, "r");
+	if (file == NULL)
+		errx(1,"opening error");
+
+	while (fgets(buffer, 256, file) != NULL)
+	{
+		nbArticles++;
+	}
+	fclose(file);
+	return nbArticles;
 }
 
 
@@ -354,19 +366,28 @@ void printPathToTarget(int pathToTarget[], int nbPathNodes, int sourceNode, int 
 	}
 
 }
+int getNbArticlesInPanier(int *panier, int nbArticles){
+	int nbArticlesInPanier = 0;
+	for(int i = 0; i < nbArticles; i++) {
+		if(panier[i] != -1){
+			nbArticlesInPanier++;
+		}
+	}
+	return nbArticlesInPanier;
+}
 
-
-void print_panier(struct Graph *graph, int panier[], Article catalogue[], int print)
+void print_panier(struct Graph *graph, int *panier, Article catalogue[], int nbArticles, int print)
 {
+	
 	if(print){
     printf("\n\nPrint panier :\n");
     printf("+------+----------------------------+-----------+-------------+\n");
     printf("| %-4s | %-26s | %-10s | %-11s |\n", "ref", "Article", "Quantité", "N° de noeud");
     printf("+------+----------------------------+-----------+-------------+\n");
-
-    for(int i = 0; i < 69; i++) {
-        if(panier[i] != -1)
-            printf("| %-4d | %-26s | %-9d | %-11d |\n",catalogue[i].ref, catalogue[i].nom, panier[i], ref_to_node(graph, catalogue[i].ref));
+    for(int i = 0; i < nbArticles; i++) {
+        if(panier[i] != -1){
+    	    printf("| %-4d | %-26s | %-9d | %-11d |\n",catalogue[i].ref, catalogue[i].nom, panier[i], ref_to_node(graph, catalogue[i].ref));
+		}
 		
     }
 
@@ -405,19 +426,19 @@ int scoreArticle(const void *a)
 
 
 // fonction qui trouve le plus court chemin dans les noueds du panier
-// panier : int [69] avec panier[i] > 0 si l'article i est dans le panier
+// panier : int [nbArticles] avec panier[i] > 0 si l'article i est dans le panier
 // renvoie le chemin sous forme d'un tableau de nodes
 //plus_court_chemin(G, panier, catalogue, sourceNode, tab, path);
-// void plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int nbart)
+// void plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int NbArticlesInPanier)
 // {
 // 	int nbPathNodes;
 // 	int targetNode;
 // 	int nbNodes = 0;
-// 	int nodes[nbart];
+// 	int nodes[nbArticlesInPanier];
 // 	int path[512];
 // 	int countPath = 0;
 // 	// on récupère les nodes du panier
-// 	for(int i = 0; i < 69; i++) {
+// 	for(int i = 0; i < nbArticles; i++) {
 // 		if(panier[i] != -1) {
 // 			nodes[nbNodes] = ref_to_node(graph, i);
 // 			nbNodes++;
@@ -428,7 +449,7 @@ int scoreArticle(const void *a)
 // 	while(!bool){
 // 		algoBellman(graph, sourceNode, tab, panier);
 // 		int test = 0;
-// 		for (int k = 0; k < nbart; k++)
+// 		for (int k = 0; k < NbArticlesInPanier; k++)
 // 		{
 // 			test += (nodes[k] != -1);
 // 		}
@@ -438,7 +459,7 @@ int scoreArticle(const void *a)
 		
 // 		int i = 0;
 // 		int i_min = 0;
-// 		while(i < nbart) {
+// 		while(i < NbArticlesInPanier) {
 // 			if(tab[nodes[i]].distance < min && nodes[i] != -1) {
 // 				min = tab[nodes[i]].distance;
 // 				targetNode = nodes[i];
@@ -461,17 +482,46 @@ int scoreArticle(const void *a)
 	
 // }
 
+void remplir_panier(int* panier, char* file, int nbArticles) {
+    for (int i = 0; i < nbArticles; i++) {
+        panier[i] = -1;
+    }
 
-void plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int nbart, int print) {
+    FILE* fichier = fopen(file, "r");
+    if (fichier == NULL) {
+        printf("Erreur lors de l'ouverture du fichier.\n");
+        return;
+    }
+
+    char ligne[100];
+    while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
+        int ref, qte;
+        if (sscanf(ligne, "%d %d", &ref, &qte) == 2) {
+            if (ref >= 0 && ref < nbArticles) {
+                panier[ref] = qte;
+            } else {
+                printf("Référence invalide : %d\n", ref);
+            }
+        }
+    }
+
+    fclose(fichier);
+}
+
+
+
+
+int *plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int NbArticlesInPanier, int nbArticles,  int print) {
     int nbPathNodes;
     int targetNode;
     int nbNodes = 0;
-    int nodes[nbart];
+    // int nodes[NbArticlesInPanier];
+	int *nodes = malloc(NbArticlesInPanier * sizeof(int));
     int path[512];
     int countPath = 0;
 
     // On récupère les nodes du panier
-    for (int i = 0; i < 69; i++) {
+    for (int i = 0; i < nbArticles; i++) {
         if (panier[i] != -1) {
             nodes[nbNodes] = ref_to_node(graph, i);
             nbNodes++;
@@ -503,10 +553,11 @@ void plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], i
 
         sourceNode = targetNode;
     }
+	return nodes;
 }
 
 
-void print_path(struct Graph *graph, int path[], int panier[], struct Article catalogue[], int print)
+void print_path(struct Graph *graph, int path[], int panier[], struct Article catalogue[], int nbArticles, int print)
 {
 	if(print)
 	{
@@ -525,10 +576,10 @@ void print_path(struct Graph *graph, int path[], int panier[], struct Article ca
 		{
 			printf("| %-11d |", path[i]);
 		
-			for (int j = 0; j < 69; j++)
+			for (int j = 0; j < nbArticles; j++)
 			{
 
-				if(panier[j] != -1 && path[i] == ref_to_node(graph, j))
+				if(panier[j] != -1 && path[i] == ref_to_node(graph, j) && test == 0)
 				{
 					printf(" %-26s | %-4d |", catalogue[j].nom, j);
 					test = 1;
@@ -549,7 +600,7 @@ void print_path(struct Graph *graph, int path[], int panier[], struct Article ca
 }
 
 
-int creer_chemin(struct Graph *G, int path[], int panier[], struct Article catalogue[], struct eltBellman tab[], int print)
+int *creer_chemin(struct Graph *G, int path[], int *panier, struct Article catalogue[], struct eltBellman tab[], int nbArticles, int print)
 {
 
 	// initialisation du tableau path à -1
@@ -574,30 +625,19 @@ int creer_chemin(struct Graph *G, int path[], int panier[], struct Article catal
 
     
 
-	catalogue = remplir_catalogue("catalogue.txt");
-	print_catalogue(catalogue, print);
+	remplir_catalogue(catalogue, "catalogue.txt");
 
-	// int panier[69];
-	for (int i = 0; i < 69; i++) {
-		panier[i] = -1;
-	}
-	panier[0] = 1; //  1 lait
-	panier[5] = 1; //  1 pain
-	panier[12] = 1; //  1 the_en_sachets
-	panier[25] = 1; //  1 haricots_blancs
-	panier[45] = 1;	//  1 oeufs_de_caille
-	panier[55] = 1; //  1 raisin
-	panier[61] = 1; //  1 carotte 
-	panier[64] = 3; //  1 oignon
-	panier[68] = 1; //  1 patate_douce
-	int nbart = 9;
+	print_catalogue(catalogue, nbArticles, print);
 
-	int panierCopy[69];
-	for (int i = 0; i < 69; i++) {
-		panierCopy[i] = panier[i];
-	}
+	remplir_panier(panier, "cart.txt", nbArticles);
+	int NbArticlesInPanier = getNbArticlesInPanier(panier, nbArticles);
 
-	print_panier(G, panierCopy, catalogue, print);
+	// int panierCopy[nbArticles];
+	// for (int i = 0; i < nbArticles; i++) { 
+	// 	panierCopy[i] = panier[i];
+	// }
+
+	print_panier(G, panier, catalogue, nbArticles, print);
 
 
 	algoBellman(G, 38, tab);
@@ -614,25 +654,16 @@ int creer_chemin(struct Graph *G, int path[], int panier[], struct Article catal
     pathToTarget(tab, 38, 12, path, &nbPathNodes);
     printPathToTarget(path, nbPathNodes, 38, 12, print);
 	
-	plus_court_chemin(G, panier, catalogue, 38, tab, path, nbart, print);
+	int *nodes = plus_court_chemin(G, panier, catalogue, 38, tab, path, NbArticlesInPanier,nbArticles, print);
 
-	print_path(G, path, panier, catalogue, print);
+	print_path(G, path, panier, catalogue, nbArticles, print);
 
-	return nbart;
+	return nodes;
 }
 	
 
 int main()
 {
-	// struct Graph *G;
-    // int path[512];
-	// int panier[69];
-	// struct Article *catalogue;
-	// int print = 1;
-
-    // struct eltBellman tab[512];
-
-	// int nbart = creer_chemin(G, path, panier, catalogue, tab, print);
 
 	main_openGL();
 
@@ -642,14 +673,13 @@ int main()
 
 // catalogue
 
-Article* remplir_catalogue(char* nom_fichier) {
+void remplir_catalogue(Article* catalogue, char* nom_fichier) {
     FILE* fichier = fopen(nom_fichier, "r");
     if (fichier == NULL) {
         printf("Impossible d'ouvrir le fichier %s\n", nom_fichier);
         exit(1);
     }
 
-    Article* catalogue = malloc(69 * sizeof(Article));
     if (catalogue == NULL) {
         printf("Impossible d'allouer de la mémoire\n");
         exit(1);
@@ -686,16 +716,15 @@ Article* remplir_catalogue(char* nom_fichier) {
 	}
     fclose(fichier);
 
-    return catalogue;
 }
-void print_catalogue(Article* catalogue, int print) {
+void print_catalogue(Article* catalogue, int nbArticles, int print) {
 	if(print)
 	{
 		printf("\n\nCatalogue :\n\n");
 		printf("+------+----------------------------+------------+--------+--------+------------+---------+\n");
 		printf("| Ref. | Nom                        |   Prix     |  Poids | Volume | Resistance | surgele |\n");
 		printf("+------+----------------------------+------------+--------+--------+------------+---------+\n");
-		for (int i = 0; i < 69; i++) {
+		for (int i = 0; i < nbArticles; i++) {
 			printf("| %4d | %-26s | %10.2f | %6.2f | %6.2f | %10.2f | %7d |\n",
 				catalogue[i].ref, catalogue[i].nom, catalogue[i].prix, catalogue[i].poids, catalogue[i].volume, catalogue[i].resistance, catalogue->frozen);
 		}
@@ -758,9 +787,11 @@ void drawLine(int x1, int y1, int x2, int y2) {
 }
 
 void drawArrow(int x1, int y1, int x2, int y2) {
+	// orange
+	glColor3f(1.0f, 0.5f, 0.0f);
     // Calculer la longueur et l'angle du trait
-    float dx = x2 - x1;
-    float dy = y2 - y1;
+    float dx = x1 - x2;
+    float dy = y1 - y2;
     float length = sqrt(dx * dx + dy * dy);
     float angle = atan2(dy, dx);
 
@@ -769,8 +800,8 @@ void drawArrow(int x1, int y1, int x2, int y2) {
     float arrowAngle = 0.5; // Angle d'ouverture de la flèche (0.5 radian)
 
     // Calculer les coordonnées du centre du trait
-    float centerX = (x1 + x2) / 2.0;
-    float centerY = (y1 + y2) / 2.0;
+    float centerX = (x2 + x1) / 2.0;
+    float centerY = (y2 + y1) / 2.0;
 
     // Calculer les coordonnées de la pointe de la flèche
     float arrowX = centerX - arrowLength * cos(angle); 
@@ -784,8 +815,8 @@ void drawArrow(int x1, int y1, int x2, int y2) {
 
     // Dessiner le trait
     glBegin(GL_LINES);
-    glVertex2i(x1, y1);
     glVertex2i(x2, y2);
+    glVertex2i(x1, y1);
     glEnd();
 
     // Dessiner la flèche
@@ -794,7 +825,26 @@ void drawArrow(int x1, int y1, int x2, int y2) {
     glVertex2f(arrowX1, arrowY1);
     glVertex2f(arrowX2, arrowY2);
     glEnd();
+
+	
 }
+
+void draw_itterator_path(int x, int y, int itterator_path) {
+    glColor3f(1.0, 0.0, 0.0); // Rouge
+
+    glBegin(GL_BITMAP);
+    glRasterPos2i(x + 20, y - 20);
+
+    char itterator_path_str[10];
+    sprintf(itterator_path_str, "%d", itterator_path);
+    int len = strlen(itterator_path_str);
+    for (int i = 0; i < len; i++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, itterator_path_str[i]);
+    }
+
+    glEnd();
+}
+
 
 
 // Fonction d'affichage
@@ -802,13 +852,23 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	// Creer le Magasin :
 	struct Graph *G = createGraph(0);
+	int nbArticles = getNbArticles("catalogue.txt");
+	printf("nbArticles : %d\n", nbArticles);
     int path[512];
-	int panier[69]; 
-	struct Article *catalogue; 
+	int *panier = malloc(nbArticles * sizeof(int));
+    Article *catalogue = malloc(nbArticles * sizeof(Article));
 
     struct eltBellman tab[512];
 	// remplir le panier, le catalogue, le tableau de Bellman et chemin (path[]) :
-	creer_chemin(G, path, panier, catalogue, tab, 1);
+	int *nodes = creer_chemin(G, path, panier, catalogue, tab,nbArticles, PRINT);
+
+	// len_panier : nombre d'articles dans le panier
+	int len_panier = 0;
+	for (int i = 0; i < nbArticles; i++) {
+		if (panier[i] != -1) {
+			len_panier++;
+		}
+	}
 
 	// tableau de marquage des couples de noeuds déjà reliés par un trait orange
 	int tab_marquage[512][512];
@@ -831,23 +891,32 @@ void display() {
 			// faire le trait en orange
 			int bool_chemin = 0;
 			int bool_arrow = 0;
+			int bool_itterator_path = 0;
 			int k = 0;
 			float X1 = node->X * 50 * scale;
 			float Y1 = node->Y * 40 * scale;
 			float X2 = adjNode->X * 50 * scale;
 			float Y2 = adjNode->Y * 40 * scale;
 
-			while (path[k+1] != -1 && !bool_chemin && k < 511) {
-				if ((path[k] == node->nodeID && path[k+1] == adjNode->nodeID)  && tab_marquage[node->nodeID][adjNode->nodeID] == 0) {
+
+
+
+			while (!bool_chemin && k < 511 && path[k+1] != -1) {
+				if ((path[k] == node->nodeID && path[k+1] == adjNode->nodeID)  && tab_marquage[node->nodeID][adjNode->nodeID] == 0 && node->boolShelf != 1 && adjNode->boolShelf != 1) {
 					bool_arrow = 1;
 					tab_marquage[node->nodeID][adjNode->nodeID] = 1;
 					tab_marquage[adjNode->nodeID][node->nodeID] = 1;
 				}
-				if((path[k] == adjNode->nodeID && path[k+1] == node->nodeID) || (path[k] == node->nodeID && path[k+1] == adjNode->nodeID)) {
+				if((path[k] == adjNode->nodeID && path[k+1] == node->nodeID) || (path[k] == node->nodeID && path[k+1] == adjNode->nodeID) ) {
 					bool_chemin = 1;
+				}
+				if(path[k] == node->nodeID && node->boolShelf ==1 && (panier[node->productsTab[0]] != -1 || panier[node->productsTab[1]] !=-1 || panier[node->productsTab[2]] !=-1 )) {
+					bool_itterator_path = 1;
+					// printf("
 				}
 				k++;
 			}
+			
 			if (bool_arrow) {
 				glColor3f(1.0, 0.5, 0.0); 
                 // Afficher la flèche
@@ -873,8 +942,25 @@ void display() {
 				}
 			}
 			drawLine(X1, Y1, X2, Y2);
+			
 		}
 	}
+
+	int vecteur_passage[512];
+	for (int i = 0; i < 512; i++) {
+		vecteur_passage[i] = 0;
+	}
+	for(int i = 0; i < len_panier; i++){
+		if(vecteur_passage[nodes[i]] == 0){
+			draw_itterator_path(G->tableNodes[nodes[i]]->X * 50 * scale, G->tableNodes[nodes[i]]->Y * 40 * scale, i+1);
+		}
+		else{
+			draw_itterator_path((G->tableNodes[nodes[i]]->X +0.25)* 50 * scale, G->tableNodes[nodes[i]]->Y * 40 * scale, -(i+1));
+		}
+		vecteur_passage[nodes[i]]++;
+	}
+
+
 
 	// Dessiner les carrés pour les catalogues
 	glColor3f(0.0, 0.0, 1.0); // Bleu
@@ -887,17 +973,16 @@ void display() {
 		// le noeud est il dans le panier ?
 		int r = 0;
 		int bool_panier = 0;
-		int somme = 0;
+		int somme = 0; 
 		while (r<3) {
-			if (node->boolShelf == 1 && panier[node->productsTab[r]] != -1) {
-				somme += panier[node->productsTab[r]];
+			if (node->boolShelf == 1 && panier[node->productsTab[r]] != -1 && r<node->nbProducts) {
+				bool_panier = 1;
 			}
-			r++;
+			r++; 
 		}
-		bool_panier = (somme > 0);
 
 		
-	    drawSquare(x, y, size, bool_panier);
+	    drawSquare(x, y, size, bool_panier); 
 
 		// Afficher le numéro du nœud
 		glColor3f(0.0, 0.0, 0.0); // Blanc
@@ -919,6 +1004,7 @@ void display() {
 	}
 	// Rafraîchir l'affichage
 	glutSwapBuffers();
+
 }
 
 	// Fonction d'initialisation

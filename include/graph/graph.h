@@ -12,6 +12,9 @@
 // 0.8 > SIZE_OF_GRAPH > 1.8
 #define SIZE_OF_GRAPH 1.8
 
+// Constante pour afficher les details des fonctions : 0 pour non, 1 pour oui
+#define PRINT 1
+
 #define M_PI 3.14159265358979323846
 
 /**
@@ -104,7 +107,7 @@ void printPathToTarget(int pathToTarget[], int nbPathNodes, int sourceNode, int 
  * @param path2       Le tableau qui stockera le chemin le plus court.
  * @param nbart       Le nombre d'articles dans le panier.
  */
-void plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int nbart, int print);
+int *plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int nbart, int nbArticles, int print);
 
 /**
  * Calcule le score d'un article en utilisant des facteurs de pondération pour les différents paramètres.
@@ -131,7 +134,7 @@ int ref_to_node(struct Graph *G, int ref);
  * @param panier Le tableau représentant le panier.
  * @param catalogue Le tableau contenant les articles du magasin.
  */
-void print_panier(struct Graph *graph, int panier[], Article catalogue[], int print);
+void print_panier(struct Graph *graph, int panier[], Article catalogue[], int nbArticles,  int print);
 /**
  * Affiche les informations d'un nœud du graphe.
  *
@@ -226,31 +229,19 @@ int distance(struct Graph *graph, int nd1, int nd2);
  */
 void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman tab[]);
 
-/**
- * Affiche le chemin le plus court passant par le panier dans un graphe, ainsi que les articles correspondants.
- *
- * @param graph         Le graphe dans lequel le chemin est calculé.
- * @param path          Tableau contenant le chemin le plus court.
- * @param panier        Tableau contenant les indices des articles dans le panier.
- * @param catalogue     Tableau des articles avec leurs références.
- */
-void print_path(struct Graph *graph, int path[], int panier[], struct Article catalogue[], int print);
+
+void print_path(struct Graph *graph, int path[], int panier[], struct Article catalogue[], int nbArticles, int print);
 
 
-/**
- * Remplit le catalogue d'articles à partir d'un fichier.
- *
- * @param nom_fichier    Le nom du fichier contenant les informations des articles.
- * @return               Un pointeur vers le tableau d'articles rempli.
- */
-Article* remplir_catalogue(char* nom_fichier);
+
+void remplir_catalogue(Article *catalogue, char* nom_fichier);
 
 /**
  * Affiche le contenu du catalogue d'articles.
  *
  * @param catalogue    Le tableau d'articles à afficher.
  */
-void print_catalogue(Article* catalogue, int print);
+void print_catalogue(Article* catalogue, int nbArticles, int print);
 
 /**
  * Dessine un carré centré aux coordonnées (x, y) avec une taille donnée.

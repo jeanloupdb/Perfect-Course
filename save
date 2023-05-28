@@ -1,4 +1,4 @@
 git add --all
-git commit -m "Chemin en graphique"
+git commit -m "projet complet non optimise"
 git pull origin main
 git push origin main
