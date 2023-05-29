@@ -8,7 +8,16 @@ https://perfectcourse.neocities.org/
  
 <h2>Tester le projet : </h2>
 
-<p>Installation des bibliotheques dans un terminal Ubuntu :</p>
+<p>Installer le projet : </p>
+<ul>
+<li>
+ <code>git clone https://github.com/jeanloupdb/Perfect-Course.git</code>
+</li>
+<li>
+  <code>cd Perfect-Course</code>
+ </li>
+</ul>
+<p>Installation des bibliotheques necessaires au fonctionnement du projet (terminal Ubuntu) :</p>
 <ul>
 <li> <code>sudo apt-get update</code><br> </li>
 <li> <code>sudo apt-get install libcurl4-openssl-dev</code><br> </li>
@@ -17,8 +26,8 @@ https://perfectcourse.neocities.org/
 <li> <code>sudo apt-get install libglu1-mesa-dev</code><br> </li>
 <li> <code>sudo apt-get install freeglut3-dev</code><br> </li>
 </ul>
-<br><br>
 
+<p>Lancer le projet</p>
 <ul>
   <li>
   lancer le programme :<br>
