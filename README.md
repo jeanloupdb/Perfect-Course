@@ -4,7 +4,7 @@
 
 https://perfectcourse.neocities.org/
 
-Votre allié pour optimiser votre temps et vos forces
+<p>Votre allié pour optimiser votre temps et vos forces</p>
 
 <p>Installation des bibliotheques dans un terminal Ubuntu :</p>
 <code>sudo apt-get update</code><br>
@@ -15,7 +15,19 @@ Votre allié pour optimiser votre temps et vos forces
 <code>sudo apt-get install freeglut3-dev</code><br>
 
 
-Tester le projet : 
-
-Se placer dans le dossier src/
-
+<p>Tester le projet : </p>
+<ul>
+<li>
+Se placer dans le dossier src/ :
+<code>cd emplacement_du_projet/src</code>
+</li>
+<li>
+lancer le programme :
+<code>make</code>
+<code>./executable</code>
+</li>
+<li>
+nettoyer les fichiers secondaires :
+<code>make clean</code>
+</li>
+</ul>
