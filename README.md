@@ -18,7 +18,7 @@ https://perfectcourse.neocities.org/
 <li> <code>sudo apt-get install freeglut3-dev</code><br> </li>
 </ul>
 <br><br>
-
+<p>Lancer le projet</p>
 <ul>
   <li>
     Se placer dans le dossier src/ :<br>
