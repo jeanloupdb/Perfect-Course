@@ -68,3 +68,4 @@
 67 pomme_de_terre 0.99 0.2 0.2 0 0 
 68 patate_douce 0.99 0.2 0.2 0 0
 69 fruit_du_dragon 2.99 0.1 0.3 0 0
+70 boeuf_bourguignon  21 1 0.1 1 0

@@ -21,16 +21,7 @@ https://perfectcourse.neocities.org/
 
 <ul>
   <li>
-    Se placer dans le dossier src/ :<br>
-    <code>cd emplacement_du_projet/src</code>
-  </li>
-  <li>
   lancer le programme :<br>
-    <code>make</code><br>
-    <code>./executable</code>
-  </li>
-  <li>
-    nettoyer les fichiers secondaires :<br>
-    <code>make clean</code>
+    <code>./create_cart</code>
   </li>
 </ul>

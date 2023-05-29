@@ -161,6 +161,7 @@ void createLink(struct Node *node1, struct Node *node2,  int print)
 	}
 }
 
+
 int *FileRead(struct Graph *G, char *filename , int print)
 {
 	FILE *file;
@@ -621,7 +622,7 @@ int *creer_chemin(struct Graph *G, int *path, int *panier, struct Article *catal
 
 	
 	if(print)
-		printf("\n\nFileRead(\"G1.txt\") :\n");
+		printf("\n\nFileRead(\"bdd/shop1.txt\") :\n");
     int start = FileRead(G, "bdd/shop1.txt", print);
 
     // // sourceNode=G->order-1; /* debut */
@@ -853,13 +854,12 @@ void draw_itterator_path(int x, int y, int itterator_path) {
 
 
 // Fonction d'affichage
-void display() { 
+void display() {  
 	glClear(GL_COLOR_BUFFER_BIT);
 	// Creer le Magasin :
 	struct Graph *G = createGraph(0);
 	int nbArticles = getNbArticles("bdd/catalogue.txt");
-	printf("nbArticles : %d\n", nbArticles);
-    int *path = malloc(512 * sizeof(int));
+    int *path = malloc(512 * sizeof(int)); 
 	int *panier = malloc(nbArticles * sizeof(int));
     Article *catalogue = malloc(nbArticles * sizeof(Article));
 

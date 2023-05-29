@@ -1,0 +1,6 @@
+wget -O cart.txt https://perfectcourse.000webhostapp.com/cart.txt && mv cart.txt src/bdd/
+cd src/
+make clean
+make
+./executable
+make clean
