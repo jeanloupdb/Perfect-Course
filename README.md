@@ -6,7 +6,7 @@ https://perfectcourse.neocities.org/
 
 Votre allié pour optimiser votre temps et vos forces
 
-Installation des bibliotheques :
+<p>Installation des bibliotheques :</p>
 <code>sudo apt-get update
 sudo apt-get install libcurl4-openssl-dev
 sudo apt-get install build-essential
