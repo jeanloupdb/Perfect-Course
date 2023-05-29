@@ -8,12 +8,12 @@ Votre allié pour optimiser votre temps et vos forces
 
 
 Installation des bibliotheques : 
-sudo apt-get update\n
-sudo apt-get install libcurl4-openssl-dev\n
-sudo apt-get install build-essential\n
-sudo apt-get install libgl1-mesa-dev\n
-sudo apt-get install libglu1-mesa-dev\n
-sudo apt-get install freeglut3-dev\n
+    sudo apt-get update
+    sudo apt-get install libcurl4-openssl-dev
+    sudo apt-get install build-essential
+    sudo apt-get install libgl1-mesa-dev
+    sudo apt-get install libglu1-mesa-dev
+    sudo apt-get install freeglut3-dev
 
 
 
