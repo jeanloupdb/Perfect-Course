@@ -17,17 +17,17 @@ https://perfectcourse.neocities.org/
 
 <p>Tester le projet : </p>
 <ul>
-<li>
-Se placer dans le dossier src/ :
-<code>cd emplacement_du_projet/src</code>
-</li>
-<li>
-lancer le programme :
-<code>make</code>
-<code>./executable</code>
-</li>
-<li>
-nettoyer les fichiers secondaires :
-<code>make clean</code>
-</li>
+  <li>
+    Se placer dans le dossier src/ :<br>
+    <code>cd emplacement_du_projet/src</code>
+  </li>
+  <li>
+  lancer le programme :<br>
+    <code>make</code><br>
+    <code>./executable</code>
+  </li>
+  <li>
+    nettoyer les fichiers secondaires :<br>
+    <code>make clean</code>
+  </li>
 </ul>
