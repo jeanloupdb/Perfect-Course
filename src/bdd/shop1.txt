@@ -36,6 +36,11 @@ department 5 top(10,3) bottom(15,3)
 07(14,4) 63 64 65
 08(14,2) 66 67 68
 
+department 6 top(16,7) bottom(16,10)
+01(15,8) -1 -1 -1
+02(17,8) 69 -1 -1
+03(15,9) -1 -1 -1
+
 Entry:
 start(9,0)
 
@@ -47,5 +52,6 @@ start(9,0)
 3_top 2_bottom
 4_top 2_bottom
 4_top 5_top
+6_top 5_bottom
 start 5_top
 start 2_top

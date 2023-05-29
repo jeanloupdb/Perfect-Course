@@ -7,6 +7,15 @@ https://perfectcourse.neocities.org/
 Votre allié pour optimiser votre temps et vos forces
 
 
+Installation des bibliotheques : 
+sudo apt-get update
+sudo apt-get install libcurl4-openssl-dev
+sudo apt-get install build-essential
+sudo apt-get install libgl1-mesa-dev
+sudo apt-get install libglu1-mesa-dev
+sudo apt-get install freeglut3-dev
+
+
 
 build/: contient le Makefile et tous les fichiers binaires générés après la compilation du code source.
 

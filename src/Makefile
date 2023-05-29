@@ -12,5 +12,6 @@ executable: graph.o
 graph.o: graph.c
 	$(CC) $(CFLAGS) -c $<
 
+
 clean:
 	rm -f *.o executable

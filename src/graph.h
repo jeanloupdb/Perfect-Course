@@ -76,7 +76,7 @@ struct eltBellman
  * @param tab Le tableau de Bellman contenant les distances et prédécesseurs des nœuds.
  * @param order Le nombre total de nœuds dans le graphe.
  */
-void printBellman(struct eltBellman tab[], int order, int print);
+void printBellman(struct eltBellman *tab, int order, int print);
 /**
  * Trouve le chemin du nœud source au nœud cible à partir du tableau de Bellman.
  *
@@ -86,7 +86,7 @@ void printBellman(struct eltBellman tab[], int order, int print);
  * @param pathToTarget Le tableau qui va contenir les nœuds du chemin du source au cible.
  * @param nbPathNodes Un pointeur vers la variable qui va contenir le nombre de nœuds dans le chemin.
  */
-void pathToTarget(struct eltBellman tabBellman[], int sourceNode, int targetNode, int pathToTarget[], int *nbPathNodes);
+void pathToTarget(struct eltBellman *tabBellman, int sourceNode, int targetNode, int *pathToTarget, int *nbPathNodes);
 /**
  * Affiche le plus court chemin entre un nœud source et un nœud cible.
  *
@@ -95,7 +95,7 @@ void pathToTarget(struct eltBellman tabBellman[], int sourceNode, int targetNode
  * @param sourceNode L'identifiant du nœud source.
  * @param targetNode L'identifiant du nœud cible.
  */
-void printPathToTarget(int pathToTarget[], int nbPathNodes, int sourceNode, int targetNode, int print);
+void printPathToTarget(int *pathToTarget, int nbPathNodes, int sourceNode, int targetNode, int print);
 /**
  * Trouve le plus court chemin en tenant compte de l'ordre de priorité des articles dans le panier.
  *
@@ -107,7 +107,8 @@ void printPathToTarget(int pathToTarget[], int nbPathNodes, int sourceNode, int 
  * @param path2       Le tableau qui stockera le chemin le plus court.
  * @param nbart       Le nombre d'articles dans le panier.
  */
-int *plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int nbart, int nbArticles, int print);
+
+int *plus_court_chemin(struct Graph *graph, int *panier, Article *catalogue, int sourceNode, struct eltBellman *tab, int *path2, int nbart, int nbArticles, int print);
 
 /**
  * Calcule le score d'un article en utilisant des facteurs de pondération pour les différents paramètres.
@@ -134,7 +135,7 @@ int ref_to_node(struct Graph *G, int ref);
  * @param panier Le tableau représentant le panier.
  * @param catalogue Le tableau contenant les articles du magasin.
  */
-void print_panier(struct Graph *graph, int panier[], Article catalogue[], int nbArticles,  int print);
+void print_panier(struct Graph *graph, int *panier, Article *catalogue, int nbArticles,  int print);
 /**
  * Affiche les informations d'un nœud du graphe.
  *
@@ -206,7 +207,7 @@ void createLink(struct Node *node1, struct Node *node2, int print);
  * @param print    Indique si les étapes de création du graphe doivent être affichées (1) ou non (0).
  * @return         Le graphe créé.
  */
-void *FileRead(struct Graph *G, char *filename, int print);
+int *FileRead(struct Graph *G, char *filename, int print);
 
 /**
  * Calcule la distance euclidienne entre deux nœuds dans un graphe.
@@ -227,10 +228,10 @@ int distance(struct Graph *graph, int nd1, int nd2);
  * @param sourceNode    L'indice du nœud source à partir duquel calculer les distances.
  * @param tab           Tableau de structures eltBellman pour stocker les distances et les prédécesseurs.
  */
-void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman tab[]);
+void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman *tab);
 
 
-void print_path(struct Graph *graph, int path[], int panier[], struct Article catalogue[], int nbArticles, int print);
+void print_path(struct Graph *graph, int path[], int panier[], struct Article *catalogue, int nbArticles, int print);
 
 
 

@@ -161,7 +161,7 @@ void createLink(struct Node *node1, struct Node *node2,  int print)
 	}
 }
 
-void *FileRead(struct Graph *G, char *filename , int print)
+int *FileRead(struct Graph *G, char *filename , int print)
 {
 	FILE *file;
 	char buffer[256];
@@ -171,6 +171,7 @@ void *FileRead(struct Graph *G, char *filename , int print)
 	char botop_1[50];char botop_2[50];
 	struct Node *debut;
 	int X1; int Y1; int X2; int Y2;
+	int start = 0;
 	
 
 	file = fopen(filename, "r");
@@ -205,7 +206,9 @@ void *FileRead(struct Graph *G, char *filename , int print)
 	//debut
 	while((fgets(buffer,256,file) != NULL) && (sscanf(buffer,"start(%d,%d)", &X1, &Y1) == 2))
 	{
-		debut=createNode(G, 2,-1,-1,-1,X1,Y1,-1,-1,-1,print);   
+		debut=createNode(G, 2,-1,-1,-1,X1,Y1,-1,-1,-1,print);
+		// start = ref du noeud debut
+		start = debut->nodeID;
 	}
 	 
 	if(print == 1)
@@ -229,6 +232,7 @@ void *FileRead(struct Graph *G, char *filename , int print)
 			createLink(debut,getNodeIntermediate(G, department_2,0)  ,   print);   /* lien entre le noeud start et le noeud bottom du rayon 2*/
 	}
 	fclose(file);
+	return start;
 }
 
 
@@ -245,7 +249,7 @@ int distance(struct Graph *graph, int nd1, int nd2)
 }
 
 
-void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman tab[]) 
+void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman *tab) 
 {
 	int i=0;
 	while (i<graph->order)
@@ -290,7 +294,7 @@ void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman tab[])
 		i++;
 	}
 }
-void printBellman(struct eltBellman tab[] , int order, int print)
+void printBellman(struct eltBellman *tab , int order, int print)
 {
 	if(print){
 		int i=0;
@@ -303,7 +307,7 @@ void printBellman(struct eltBellman tab[] , int order, int print)
 
 }
 
-void pathToTarget(struct eltBellman tabBellman[], int sourceNode, int targetNode, int pathToTarget[], int *nbPathNodes)
+void pathToTarget(struct eltBellman *tabBellman, int sourceNode, int targetNode, int *pathToTarget, int *nbPathNodes)
 {
 	int node=targetNode;
 	int i=0;
@@ -335,7 +339,7 @@ void pathToTarget(struct eltBellman tabBellman[], int sourceNode, int targetNode
 	}
 }
 
-// void printPathToTarget(struct Graph *graph, int pathToTarget[], int nbPathNodes)
+// void printPathToTarget(struct Graph *graph, int *pathToTarget, int nbPathNodes)
 // {
 // 	int i=0;
 // 	printf("path\n");
@@ -355,7 +359,7 @@ void pathToTarget(struct eltBellman tabBellman[], int sourceNode, int targetNode
 
 
 
-void printPathToTarget(int pathToTarget[], int nbPathNodes, int sourceNode, int targetNode, int print)
+void printPathToTarget(int *pathToTarget, int nbPathNodes, int sourceNode, int targetNode, int print)
 {
 	if(print){
 		printf("\n\nPlus court chemin : %d => %d\n", sourceNode, targetNode);
@@ -376,7 +380,7 @@ int getNbArticlesInPanier(int *panier, int nbArticles){
 	return nbArticlesInPanier;
 }
 
-void print_panier(struct Graph *graph, int *panier, Article catalogue[], int nbArticles, int print)
+void print_panier(struct Graph *graph, int *panier, Article *catalogue, int nbArticles, int print)
 {
 	
 	if(print){
@@ -511,7 +515,7 @@ void remplir_panier(int* panier, char* file, int nbArticles) {
 
 
 
-int *plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int NbArticlesInPanier, int nbArticles,  int print) {
+int *plus_court_chemin(struct Graph *graph, int *panier, Article *catalogue, int sourceNode, struct eltBellman *tab, int *path2, int NbArticlesInPanier, int nbArticles,  int print) {
     int nbPathNodes;
     int targetNode;
     int nbNodes = 0;
@@ -557,7 +561,7 @@ int *plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], i
 }
 
 
-void print_path(struct Graph *graph, int path[], int panier[], struct Article catalogue[], int nbArticles, int print)
+void print_path(struct Graph *graph, int *path, int *panier, struct Article *catalogue, int nbArticles, int print)
 {
 	if(print)
 	{
@@ -600,7 +604,8 @@ void print_path(struct Graph *graph, int path[], int panier[], struct Article ca
 }
 
 
-int *creer_chemin(struct Graph *G, int path[], int *panier, struct Article catalogue[], struct eltBellman tab[], int nbArticles, int print)
+
+int *creer_chemin(struct Graph *G, int *path, int *panier, struct Article *catalogue, struct eltBellman *tab, int nbArticles, int print)
 {
 
 	// initialisation du tableau path à -1
@@ -617,7 +622,7 @@ int *creer_chemin(struct Graph *G, int path[], int *panier, struct Article catal
 	
 	if(print)
 		printf("\n\nFileRead(\"G1.txt\") :\n");
-    FileRead(G, "shop1.txt", print);
+    int start = FileRead(G, "bdd/shop1.txt", print);
 
     // // sourceNode=G->order-1; /* debut */
 	// sourceNode=45;
@@ -625,11 +630,11 @@ int *creer_chemin(struct Graph *G, int path[], int *panier, struct Article catal
 
     
 
-	remplir_catalogue(catalogue, "catalogue.txt");
+	remplir_catalogue(catalogue, "bdd/catalogue.txt");
 
 	print_catalogue(catalogue, nbArticles, print);
 
-	remplir_panier(panier, "cart.txt", nbArticles);
+	remplir_panier(panier, "bdd/cart.txt", nbArticles);
 	int NbArticlesInPanier = getNbArticlesInPanier(panier, nbArticles);
 
 	// int panierCopy[nbArticles];
@@ -640,10 +645,10 @@ int *creer_chemin(struct Graph *G, int path[], int *panier, struct Article catal
 	print_panier(G, panier, catalogue, nbArticles, print);
 
 
-	algoBellman(G, 38, tab);
+	algoBellman(G, start, tab);
 
 	if(print)
-		printf("\n\nprint bellman(38)\n");
+		printf("\n\nprint bellman(%d)\n", start);
     // while (i<G->order) 
     // {
     //     printf("node%d: distance=%d, precedent:%d\n",i,tab[i].distance,tab[i].precedentNode);
@@ -651,10 +656,10 @@ int *creer_chemin(struct Graph *G, int path[], int *panier, struct Article catal
     // }
 	printBellman(tab, G->order, print);
 
-    pathToTarget(tab, 38, 12, path, &nbPathNodes);
-    printPathToTarget(path, nbPathNodes, 38, 12, print);
+    pathToTarget(tab, start, 12, path, &nbPathNodes);
+    printPathToTarget(path, nbPathNodes, start, 12, print);
 	
-	int *nodes = plus_court_chemin(G, panier, catalogue, 38, tab, path, NbArticlesInPanier,nbArticles, print);
+	int *nodes = plus_court_chemin(G, panier, catalogue, start, tab, path, NbArticlesInPanier,nbArticles, print);
 
 	print_path(G, path, panier, catalogue, nbArticles, print);
 
@@ -852,13 +857,13 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	// Creer le Magasin :
 	struct Graph *G = createGraph(0);
-	int nbArticles = getNbArticles("catalogue.txt");
+	int nbArticles = getNbArticles("bdd/catalogue.txt");
 	printf("nbArticles : %d\n", nbArticles);
-    int path[512];
+    int *path = malloc(512 * sizeof(int));
 	int *panier = malloc(nbArticles * sizeof(int));
     Article *catalogue = malloc(nbArticles * sizeof(Article));
 
-    struct eltBellman tab[512];
+    struct eltBellman *tab = malloc(512 * sizeof(struct eltBellman));
 	// remplir le panier, le catalogue, le tableau de Bellman et chemin (path[]) :
 	int *nodes = creer_chemin(G, path, panier, catalogue, tab,nbArticles, PRINT);
 
@@ -933,7 +938,7 @@ void display() {
 					// Modifier l'épaisseur de la ligne
 						glLineWidth(2);
 					// gris pour les liens entre rayons
-					glColor3f(0.5, 0.5, 0.5);
+					glColor3f(0.9, 0.9, 0.9);
 				}else{
 					// Modifier l'épaisseur de la ligne
 						glLineWidth(5);
@@ -1004,6 +1009,12 @@ void display() {
 	}
 	// Rafraîchir l'affichage
 	glutSwapBuffers();
+
+	free(tab);
+	free(path);
+	free(nodes);
+	free(panier);
+	free(catalogue);
 
 }
 
