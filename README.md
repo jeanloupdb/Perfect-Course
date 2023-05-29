@@ -6,6 +6,8 @@ https://perfectcourse.neocities.org/
 
 <p>Votre allié pour optimiser votre temps et vos forces</p>
 
+<h2>Tester le projet : </h2>
+
 <p>Installation des bibliotheques dans un terminal Ubuntu :</p>
 <ul>
 <li> <code>sudo apt-get update</code><br> </li>
@@ -17,7 +19,6 @@ https://perfectcourse.neocities.org/
 </ul>
 <br><br>
 
-<p>Tester le projet : </p>
 <ul>
   <li>
     Se placer dans le dossier src/ :<br>
