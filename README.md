@@ -30,7 +30,6 @@ https://perfectcourse.neocities.org/
 <p>Lancer le projet</p>
 <ul>
   <li>
-  lancer le programme :<br>
     <code>./create_cart</code>
   </li>
 </ul>
