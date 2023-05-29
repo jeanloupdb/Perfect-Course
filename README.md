@@ -17,7 +17,7 @@ https://perfectcourse.neocities.org/
   <code>cd Perfect-Course</code>
  </li>
 </ul>
-<p>Installation des bibliotheques dans un terminal Ubuntu :</p>
+<p>Installation des bibliotheques necessaires au fonctionnement du projet (terminal Ubuntu) :</p>
 <ul>
 <li> <code>sudo apt-get update</code><br> </li>
 <li> <code>sudo apt-get install libcurl4-openssl-dev</code><br> </li>
