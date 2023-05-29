@@ -26,7 +26,7 @@ https://perfectcourse.neocities.org/
 <li> <code>sudo apt-get install libglu1-mesa-dev</code><br> </li>
 <li> <code>sudo apt-get install freeglut3-dev</code><br> </li>
 </ul>
-<br><br>
+
 <p>Lancer le projet</p>
 <ul>
   <li>
