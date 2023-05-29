@@ -8,6 +8,15 @@ https://perfectcourse.neocities.org/
  
 <h2>Tester le projet : </h2>
 
+<p>Installer le projet : </p>
+<ul>
+<li>
+ <code>git clone https://github.com/jeanloupdb/Perfect-Course.git</code>
+</li>
+<li>
+  <code>cd Perfect-Course</code>
+ </li>
+</ul>
 <p>Installation des bibliotheques dans un terminal Ubuntu :</p>
 <ul>
 <li> <code>sudo apt-get update</code><br> </li>
