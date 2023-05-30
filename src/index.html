@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Catalogue</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+
+    <div id="attention">/!\ Page en cours de developpement : n'hesitez pas à rafrachir la page plusieurs fois si les produits n'apparaissent pas /!\</div>
+
+    <h1>PerfectCourse</h1>
+    <h2>Remplissez votre panier</h2>
+    <div>
+
+        <p>Pour voir l'itineraire dans le magasin : <br>Fermer firefox et <br>Ecrire dans le terminal linux :<br><code>./run</code></p>
+
+        <div id="cartContainer">
+            <h2>Panier</h2>
+            <ul id="cartItems"></ul>
+            <!-- Bouton "Vider le panier" -->
+            <button id="emptyCartButton">Vider le panier</button>
+        </div>
+
+        <div id="productContainer">
+            <input type="text" id="searchInput" placeholder="Rechercher un produit" oninput="filterProducts()">
+            <ul id="productList"></ul>
+
+            <!-- Formulaire de quantité -->
+            <form id="quantityForm" style="display: none;" method="post">
+                <input type="number" id="quantityInput" name="quantity" min="1" value="1">
+                <input type="submit" value="Valider">
+            </form>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>

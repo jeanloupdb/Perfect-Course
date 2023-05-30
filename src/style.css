@@ -1,0 +1,176 @@
+/* Réinitialisation des styles de base */
+
+html,
+body,
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+
+/* police de caractères */
+
+@font-face {
+    font-family: 'rubik';
+    src: url('Rubik-Regular.ttf') format('truetype');
+}
+
+body {
+    font-family: 'rubik', sans-serif;
+}
+
+
+/* Styles pour l'en-tête */
+
+h1 {
+    text-align: center;
+    margin: 20px 0 20px 0;
+    font-size: 60px;
+}
+
+h2 {
+    text-align: center;
+    margin: 20px 0 100px 0;
+}
+
+
+/* Styles pour la barre de recherche */
+
+#searchInput {
+    display: block;
+    margin: 0 auto;
+    width: 300px;
+    padding: 8px;
+    font-size: 16px;
+}
+
+
+/* Styles pour la liste de produits */
+
+#productList {
+    list-style: none;
+    margin: 20px auto;
+    width: 600px;
+}
+
+#productList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#productList li:last-child {
+    border-bottom: none;
+}
+
+#productList li .product-name {
+    flex: 1;
+}
+
+#productList li .add-to-cart {
+    background-color: #a5c0a6;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#productList li .add-to-cart:hover {
+    background-color: #dce9dc;
+}
+
+#productList li .quantity-form {
+    display: none;
+    align-items: center;
+}
+
+#productList li .quantity-form input[type="number"] {
+    width: 50px;
+    padding: 4px;
+}
+
+#productList li .quantity-form input[type="submit"] {
+    background-color: #adb6ad;
+    color: #000;
+    border: none;
+    padding: 4px 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#productList li .quantity-form input[type="submit"]:hover {
+    background-color: #7c8d7d;
+}
+
+
+/* Styles pour les produits sélectionnés */
+
+#productList li.selection {
+    background-color: #f1f8e9;
+}
+
+
+/* Style pour les messages d'erreur */
+
+.error-message {
+    color: #f44336;
+    margin: 10px;
+}
+
+
+/* Style pour les messages de succès */
+
+.success-message {
+    color: #a2b4a2;
+    margin: 10px;
+}
+
+#productContainer {
+    width: 70%;
+    float: left;
+}
+
+#cartContainer {
+    width: 30%;
+    float: left;
+    text-align: center;
+}
+
+#cartItems {
+    list-style-type: none;
+    padding: 0;
+}
+
+.selection {
+    background-color: yellow;
+}
+
+#emptyCartButton {
+    margin-top: 20px;
+    background-color: #a5c0a6;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#emptyCartButton:hover {
+    background-color: #dce9dc;
+}
+
+p {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px 20%;
+    text-align: center;
+    border: 5px solid #a5c0a6;
+    border-radius: 10px;
+}
+
+.attention {
+    color: #f44336;
+}
