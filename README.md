@@ -32,4 +32,13 @@ https://perfectcourse.neocities.org/
   <li>
     <code>./create_cart</code>
   </li>
+  <li>
+    Faire votre liste de course sur le site
+  </li>
+  <li>
+    Fermer firefox
+  </li>
+  <li>
+    Executez la commande <code>./run</code>
+  </li>
 </ul>
