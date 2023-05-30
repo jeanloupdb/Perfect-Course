@@ -6,7 +6,7 @@
 5 pain 1.29 0.5 0.5 0 0 
 6 baguette 0.99 0.4 0.4 0 0 
 7 croissant 0.79 0.1 0.1 0 0 
-8 biscottes 1.49 0.3 0.3 0 0 
+8 biscottes 1.49 0.3 0.3 1 0 
 9 cereales 3.29 0.5 0.5 0 0 
 10 chocolat_en_poudre 2.79 0.5 0.5 0 0 
 11 cafe_moulu 3.99 0.25 0.25 0 0 

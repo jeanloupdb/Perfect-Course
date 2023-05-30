@@ -1,4 +1,4 @@
 git add --all
-git commit -m "code fini"
+git commit -m "rendu"
 git pull origin main
 git push origin main

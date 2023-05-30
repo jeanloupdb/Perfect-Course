@@ -68,230 +68,318 @@ struct eltBellman
 };
 
 
-// Prototypes des fonctions
+/**
+ * Creates a new graph with the specified printing option.
+ *
+ * @param print The printing option (0 - no printing, 1 - print node details).
+ * @return The pointer to the created graph.
+ */
+struct Graph *createGraph(int print);
 
 /**
- * Affiche les résultats du tableau de Bellman.
+ * Prints the details of a given node.
  *
- * @param tab Le tableau de Bellman contenant les distances et prédécesseurs des nœuds.
- * @param order Le nombre total de nœuds dans le graphe.
- */
-void printBellman(struct eltBellman *tab, int order, int print);
-/**
- * Trouve le chemin du nœud source au nœud cible à partir du tableau de Bellman.
- *
- * @param tabBellman Le tableau de Bellman contenant les distances et prédécesseurs des nœuds.
- * @param sourceNode L'identifiant du nœud source.
- * @param targetNode L'identifiant du nœud cible.
- * @param pathToTarget Le tableau qui va contenir les nœuds du chemin du source au cible.
- * @param nbPathNodes Un pointeur vers la variable qui va contenir le nombre de nœuds dans le chemin.
- */
-void pathToTarget(struct eltBellman *tabBellman, int sourceNode, int targetNode, int *pathToTarget, int *nbPathNodes);
-/**
- * Affiche le plus court chemin entre un nœud source et un nœud cible.
- *
- * @param pathToTarget Le tableau des nœuds formant le plus court chemin.
- * @param nbPathNodes Le nombre de nœuds dans le plus court chemin.
- * @param sourceNode L'identifiant du nœud source.
- * @param targetNode L'identifiant du nœud cible.
- */
-void printPathToTarget(int *pathToTarget, int nbPathNodes, int sourceNode, int targetNode, int print);
-/**
- * Trouve le plus court chemin en tenant compte de l'ordre de priorité des articles dans le panier.
- *
- * @param graph       Le graphe représentant le magasin.
- * @param panier      Le panier contenant les articles à récupérer.
- * @param catalogue   Le catalogue des articles avec leurs caractéristiques.
- * @param sourceNode  Le nœud source à partir duquel commencer la recherche.
- * @param tab         Le tableau des distances et des prédécesseurs généré par l'algorithme de Bellman.
- * @param path2       Le tableau qui stockera le chemin le plus court.
- * @param nbart       Le nombre d'articles dans le panier.
- */
-
-int *plus_court_chemin(struct Graph *graph, int *panier, Article *catalogue, int sourceNode, struct eltBellman *tab, int *path2, int nbart, int nbArticles, int print);
-
-/**
- * Calcule le score d'un article en utilisant des facteurs de pondération pour les différents paramètres.
- *
- * @param a Pointeur générique vers l'article dont on souhaite calculer le score.
- * @return Le score de l'article.
- */
-int scoreArticle(const void *a);
-
-
-/**
- * Transforme une référence d'article en identifiant de nœud correspondant dans le graphe.
- *
- * @param G Le graphe contenant les nœuds.
- * @param ref La référence de l'article.
- * @return L'identifiant du nœud correspondant à la référence de l'article,
- *         ou -1 si aucun nœud ne correspond à la référence donnée.
- */
-int ref_to_node(struct Graph *G, int ref);
-/**
- * Affiche le contenu du panier avec les informations sur chaque article.
- *
- * @param graph Le graphe contenant les nœuds.
- * @param panier Le tableau représentant le panier.
- * @param catalogue Le tableau contenant les articles du magasin.
- */
-void print_panier(struct Graph *graph, int *panier, Article *catalogue, int nbArticles,  int print);
-/**
- * Affiche les informations d'un nœud du graphe.
- *
- * @param node Le nœud à afficher.
+ * @param node The node to be printed.
+ * @param print The printing option (0 - no printing, 1 - print node details).
  */
 void printNode(struct Node *node, int print);
+
 /**
- * Affiche la liaison entre deux nœuds du graphe.
+ * Prints the details of a link between two nodes.
  *
- * @param node1 Le premier nœud de la liaison.
- * @param node2 Le deuxième nœud de la liaison.
+ * @param node1 The first node of the link.
+ * @param node2 The second node of the link.
+ * @param print The printing option (0 - no printing, 1 - print link details).
  */
 void printLink(struct Node *node1, struct Node *node2, int print);
 
 /**
- * Crée un nouveau nœud dans un graphe.
+ * Retrieves the number of articles in the specified file.
  *
- * @param G                Le graphe dans lequel créer le nœud.
- * @param boolShelf        Indique le type de nœud : 0 pour extrémité d'une étagère, 1 pour produit, 2 pour entrée de l'entrepôt.
- * @param aisle            Le numéro de l'allée du nœud (valide uniquement si boolShelf est égal à 0 ou 1).
- * @param shelf            Le numéro de l'étagère du nœud (valide uniquement si boolShelf est égal à 0 ou 1).
- * @param boolTopBottom    Indique la position verticale du nœud : 0 pour intermédiaire, 1 pour le haut, 2 pour le bas.
- * @param X                La coordonnée X du nœud.
- * @param Y                La coordonnée Y du nœud.
- * @param p1               La référence du premier produit du nœud.
- * @param p2               La référence du deuxième produit du nœud.
- * @param p3               La référence du troisième produit du nœud.
- * @param print            Un entier indiquant si l'impression est activée (1) ou désactivée (0).
- * @return Le nœud nouvellement créé.
+ * @param filename The name of the file.
+ * @return The number of articles.
  */
-struct Node *createNode(struct Graph *G, int boolShelf, int aisle, int shelf, int boolTopBottom, int X, int Y, int p1, int p2, int p3, int print);
-
+int getNbArticles(char *filename);
 
 /**
- * Renvoie le nœud d'étagère correspondant à l'étage et à la colonne spécifiés.
+ * Creates a new node in the graph with the specified attributes.
  *
- * @param department Le numéro de l'étage.
- * @param shelf      Le numéro de la colonne.
- * @return           Le nœud d'étagère correspondant, ou NULL s'il n'est pas trouvé.
+ * @param G The graph in which the node will be created.
+ * @param boolShelf Indicates if the node represents a shelf (1 - true, 0 - false).
+ * @param department The department of the node.
+ * @param shelf The shelf number of the node.
+ * @param boolTopBottom Indicates if the node is on the top or bottom level (1 - top, 0 - bottom).
+ * @param X The X-coordinate of the node.
+ * @param Y The Y-coordinate of the node.
+ * @param p1 The first parameter of the node.
+ * @param p2 The second parameter of the node.
+ * @param p3 The third parameter of the node.
+ * @param print The printing option (0 - no printing, 1 - print node details).
+ * @return The pointer to the created node.
+ */
+struct Node *createNode(struct Graph *G, int boolShelf, int department, int shelf, int boolTopBottom, int X, int Y, int p1, int p2, int p3, int print);
+
+/**
+ * Retrieves the node representing a shelf in the specified department and shelf number.
+ *
+ * @param G The graph containing the nodes.
+ * @param department The department of the shelf.
+ * @param shelf The shelf number.
+ * @return The pointer to the node representing the shelf.
  */
 struct Node *getNodeShelf(struct Graph *G, int department, int shelf);
 
-
-
 /**
- * Retourne un pointeur vers un nœud intermédiaire dans un graphe.
+ * Retrieves the intermediate node in the specified department and top/bottom level.
  *
- * @param G               Le graphe dans lequel rechercher le nœud intermédiaire.
- * @param department      Le numéro du rayon du nœud intermédiaire recherché.
- * @param boolTopBottom   Le booléen indiquant si le nœud intermédiaire est du haut (1) ou du bas (2).
- * @return                Un pointeur vers le nœud intermédiaire correspondant, ou NULL si aucun nœud n'a été trouvé.
+ * @param G The graph containing the nodes.
+ * @param department The department of the intermediate node.
+ * @param boolTopBottom Indicates if the node is on the top or bottom level (1 - top, 0 - bottom).
+ * @return The pointer to the intermediate node.
  */
 struct Node *getNodeIntermediate(struct Graph *G, int department, int boolTopBottom);
 
 /**
- * Crée un lien entre deux nœuds dans un graphe.
+ * Creates a link between two nodes in the graph.
  *
- * @param node1    Le premier nœud à relier.
- * @param node2    Le deuxième nœud à relier.
- * @param print    Un entier indiquant si l'impression est activée (1) ou désactivée (0).
+ * @param node1 The first node.
+ * @param node2 The second node.
+ * @param print The printing option (0 - no printing, 1 - print link details).
  */
 void createLink(struct Node *node1, struct Node *node2, int print);
 
-
 /**
- * Crée le graphe représentant le plan de stockage à partir d'un fichier.
+ * Reads the data from the specified file and stores it in the graph.
  *
- * @param filename Le nom du fichier contenant les informations du plan de stockage.
- * @param print    Indique si les étapes de création du graphe doivent être affichées (1) ou non (0).
- * @return         Le graphe créé.
+ * @param G The graph in which the data will be stored.
+ * @param filename The name of the file.
+ * @param print The printing option (0 - no printing, 1 - print node details).
+ * @return An array containing the read data.
  */
 int *FileRead(struct Graph *G, char *filename, int print);
 
 /**
- * Calcule la distance euclidienne entre deux nœuds dans un graphe.
+ * Calculates the distance between two nodes in the graph.
  *
- * @param graph     Le graphe dans lequel les nœuds sont situés.
- * @param nd1       L'indice du premier nœud.
- * @param nd2       L'indice du deuxième nœud.
- *
- * @return          La distance euclidienne entre les deux nœuds arrondie à l'entier le plus proche.
+ * @param graph The graph containing the nodes.
+ * @param nd1 The index of the first node.
+ * @param nd2 The index of the second node.
+ * @return The distance between the two nodes.
  */
 int distance(struct Graph *graph, int nd1, int nd2);
 
 /**
- * Effectue l'algorithme de Bellman-Ford sur un graphe à partir d'un nœud source.
- * Calcule les distances minimales entre le nœud source et tous les autres nœuds du graphe.
+ * Executes the Bellman-Ford algorithm on the graph starting from the specified source node.
  *
- * @param graph         Le graphe sur lequel l'algorithme est appliqué.
- * @param sourceNode    L'indice du nœud source à partir duquel calculer les distances.
- * @param tab           Tableau de structures eltBellman pour stocker les distances et les prédécesseurs.
+ * @param graph The graph on which the algorithm will be executed.
+ * @param sourceNode The index of the source node.
+ * @param tab The array to store the results of the algorithm.
  */
 void algoBellman(struct Graph *graph, int sourceNode, struct eltBellman *tab);
 
-
-void print_path(struct Graph *graph, int path[], int panier[], struct Article *catalogue, int nbArticles, int print);
-
-
-
-void remplir_catalogue(Article *catalogue, char* nom_fichier);
-
 /**
- * Affiche le contenu du catalogue d'articles.
+ * Prints the results of the Bellman-Ford algorithm.
  *
- * @param catalogue    Le tableau d'articles à afficher.
+ * @param tab The array containing the results of the algorithm.
+ * @param order The order of the graph.
+ * @param print The printing option (0 - no printing, 1 - print node details).
  */
-void print_catalogue(Article* catalogue, int nbArticles, int print);
+void printBellman(struct eltBellman *tab, int order, int print);
 
 /**
- * Dessine un carré centré aux coordonnées (x, y) avec une taille donnée.
+ * Calculates the path from the source node to the target node based on the results of the Bellman-Ford algorithm.
  *
- * @param x     Coordonnée x du centre du carré.
- * @param y     Coordonnée y du centre du carré.
- * @param size  Taille du carré.
- * @param bool_panier   Indique si le carré est un panier (1) ou non (0).
+ * @param tabBellman The array containing the results of the algorithm.
+ * @param sourceNode The index of the source node.
+ * @param targetNode The index of the target node.
+ * @param pathToTarget The array to store the path from the source to the target node.
+ * @param nbPathNodes The number of nodes in the path.
+ */
+void pathToTarget(struct eltBellman *tabBellman, int sourceNode, int targetNode, int *pathToTarget, int *nbPathNodes);
+
+/**
+ * Prints the path from the source node to the target node.
+ *
+ * @param pathToTarget The array containing the path from the source to the target node.
+ * @param nbPathNodes The number of nodes in the path.
+ * @param sourceNode The index of the source node.
+ * @param targetNode The index of the target node.
+ * @param print The printing option (0 - no printing, 1 - print node details).
+ */
+void printPathToTarget(int *pathToTarget, int nbPathNodes, int sourceNode, int targetNode, int print);
+
+/**
+ * Retrieves the number of articles in the panier (cart).
+ *
+ * @param panier The array representing the cart.
+ * @param nbArticles The total number of articles.
+ * @return The number of articles in the cart.
+ */
+int getNbArticlesInPanier(int *panier, int nbArticles);
+
+/**
+ * Prints the contents of the panier (cart).
+ *
+ * @param graph The graph containing the nodes.
+ * @param panier The array representing the cart.
+ * @param catalogue The array containing the article data.
+ * @param nbArticles The total number of articles.
+ * @param print The printing option (0 - no printing, 1 - print node details).
+ */
+void print_panier(struct Graph *graph, int *panier, Article *catalogue, int nbArticles, int print);
+
+/**
+ * Converts the reference to the corresponding node index in the graph.
+ *
+ * @param G The graph containing the nodes.
+ * @param ref The reference value.
+ * @return The index of the node.
+ */
+int ref_to_node(struct Graph *G, int ref);
+
+/**
+ * Compares two articles based on their scores.
+ *
+ * @param a The first article.
+ * @return The comparison result.
+ */
+int scoreArticle(const void *a);
+
+/**
+ * Fills the cart with articles based on the specified file.
+ *
+ * @param panier The array representing the cart.
+ * @param file The name of the file.
+ * @param nbArticles The total number of articles.
+ */
+void remplir_panier(int *panier, char *file, int nbArticles);
+
+/**
+ * Calculates the shortest path from the source node to the target node, considering the articles in the cart.
+ *
+ * @param graph The graph containing the nodes.
+ * @param panier The array representing the cart.
+ * @param catalogue The array containing the article data.
+ * @param sourceNode The index of the source node.
+ * @param tab The array containing the results of the Bellman-Ford algorithm.
+ * @param path2 The array to store the shortest path.
+ * @param NbArticlesInPanier The number of articles in the cart.
+ * @param nbArticles The total number of articles.
+ * @param print The printing option (0 - no printing, 1 - print node details).
+ * @return The shortest path as an array.
+ */
+int *plus_court_chemin(struct Graph *graph, int *panier, Article *catalogue, int sourceNode, struct eltBellman *tab, int *path2, int NbArticlesInPanier, int nbArticles, int print);
+
+/**
+ * Prints the path based on the given graph, path, cart, catalogue, and printing option.
+ *
+ * @param graph The graph containing the nodes.
+ * @param path The array representing the path.
+ * @param panier The array representing the cart.
+ * @param catalogue The array containing the article data.
+ * @param nbArticles The total number of articles.
+ * @param print The printing option (0 - no printing, 1 - print node details).
+ */
+void print_path(struct Graph *graph, int *path, int *panier, struct Article *catalogue, int nbArticles, int print);
+
+/**
+ * Creates a path based on the given graph, path, cart, catalogue, Bellman-Ford results, number of articles, and printing option.
+ *
+ * @param G The graph containing the nodes.
+ * @param path The array representing the path.
+ * @param panier The array representing the cart.
+ * @param catalogue The array containing the article data.
+ * @param tab The array containing the results of the Bellman-Ford algorithm.
+ * @param nbArticles The total number of articles.
+ * @param print The printing option (0 - no printing, 1 - print node details).
+ * @return The created path as an array.
+ */
+int *creer_chemin(struct Graph *G, int *path, int *panier, struct Article *catalogue, struct eltBellman *tab, int nbArticles, int print);
+
+/**
+ * Fills the catalogue with article data from the specified file.
+ *
+ * @param catalogue The array to store the article data.
+ * @param nom_fichier The name of the file.
+ */
+void remplir_catalogue(Article *catalogue, char *nom_fichier);
+
+/**
+ * Prints the contents of the catalogue.
+ *
+ * @param catalogue The array containing the article data.
+ * @param nbArticles The total number of articles.
+ * @param print The printing option (0 - no printing, 1 - print node details).
+ */
+void print_catalogue(Article *catalogue, int nbArticles, int print);
+
+/**
+ * Draws a square at the specified position with the specified size.
+ *
+ * @param x The X-coordinate of the square's top-left corner.
+ * @param y The Y-coordinate of the square's top-left corner.
+ * @param size The size of the square.
+ * @param bool_panier Indicates if the square represents a cart item (1 - true, 0 - false).
  */
 void drawSquare(int x, int y, int size, int bool_panier);
 
 /**
- * Dessine une ligne entre les coordonnées (x1, y1) et (x2, y2).
+ * Draws a line between two points.
  *
- * @param x1    Coordonnée x du premier point de la ligne.
- * @param y1    Coordonnée y du premier point de la ligne.
- * @param x2    Coordonnée x du deuxième point de la ligne.
- * @param y2    Coordonnée y du deuxième point de la ligne.
+ * @param x1 The X-coordinate of the first point.
+ * @param y1 The Y-coordinate of the first point.
+ * @param x2 The X-coordinate of the second point.
+ * @param y2 The Y-coordinate of the second point.
  */
 void drawLine(int x1, int y1, int x2, int y2);
 
 /**
- * Fonction d'affichage principale.
- * Cette fonction est appelée à chaque rafraîchissement de l'écran.
- * Elle dessine les éléments du magasin en utilisant OpenGL.
+ * Draws an arrow between two points.
+ *
+ * @param x1 The X-coordinate of the starting point.
+ * @param y1 The Y-coordinate of the starting point.
+ * @param x2 The X-coordinate of the ending point.
+ * @param y2 The Y-coordinate of the ending point.
+ */
+void drawArrow(int x1, int y1, int x2, int y2);
+
+/**
+ * Draws the iterator path at the specified position.
+ *
+ * @param x The X-coordinate of the iterator path.
+ * @param y The Y-coordinate of the iterator path.
+ * @param itterator_path The iterator path value.
+ */
+void draw_itterator_path(int x, int y, int itterator_path);
+
+/**
+ * Displays the OpenGL window.
  */
 void display();
 
 /**
- * Fonction d'initialisation d'OpenGL.
- * Cette fonction est appelée au démarrage du programme pour configurer les paramètres d'OpenGL.
+ * Initializes the OpenGL environment.
  */
 void init();
 
 /**
- * Fonction de redimensionnement de la fenêtre OpenGL.
+ * Reshapes the OpenGL window to the specified width and height.
  *
- * @param w     Nouvelle largeur de la fenêtre.
- * @param h     Nouvelle hauteur de la fenêtre.
+ * @param w The new width of the window.
+ * @param h The new height of the window.
  */
 void reshape(int w, int h);
 
 /**
- * Fonction principale du programme OpenGL.
- * Elle initialise GLUT, crée la fenêtre et lance la boucle principale.
+ * The main function for the OpenGL program.
  *
- * @return      Code de retour du programme.
+ * @return The program exit code.
  */
 int main_openGL();
+
+
+
+
 
 
 #endif // __GRAPH_H__

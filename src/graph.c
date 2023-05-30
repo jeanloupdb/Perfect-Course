@@ -340,22 +340,6 @@ void pathToTarget(struct eltBellman *tabBellman, int sourceNode, int targetNode,
 	}
 }
 
-// void printPathToTarget(struct Graph *graph, int *pathToTarget, int nbPathNodes)
-// {
-// 	int i=0;
-// 	printf("path\n");
-// 	while (i<nbPathNodes)
-// 		{
-// 			int node=pathToTarget[i];
-// 			printf("->Id%d[%d,%d](%d,%d,%d)",node,graph->tableNodes[node]->department,graph->tableNodes[node]->shelf,
-// 				graph->tableNodes[node]->productsTab[0],
-// 				graph->tableNodes[node]->productsTab[1],
-// 				graph->tableNodes[node]->productsTab[2]);
-
-// 			i++;
-// 		}
-// 	printf("\n");
-// }
 
 
 
@@ -429,63 +413,6 @@ int scoreArticle(const void *a)
 
 
 
-
-// fonction qui trouve le plus court chemin dans les noueds du panier
-// panier : int [nbArticles] avec panier[i] > 0 si l'article i est dans le panier
-// renvoie le chemin sous forme d'un tableau de nodes
-//plus_court_chemin(G, panier, catalogue, sourceNode, tab, path);
-// void plus_court_chemin(struct Graph *graph, int panier[], Article catalogue[], int sourceNode, struct eltBellman tab[], int path2[], int NbArticlesInPanier)
-// {
-// 	int nbPathNodes;
-// 	int targetNode;
-// 	int nbNodes = 0;
-// 	int nodes[nbArticlesInPanier];
-// 	int path[512];
-// 	int countPath = 0;
-// 	// on récupère les nodes du panier
-// 	for(int i = 0; i < nbArticles; i++) {
-// 		if(panier[i] != -1) {
-// 			nodes[nbNodes] = ref_to_node(graph, i);
-// 			nbNodes++;
-// 		}
-// 	}
-
-// 	int bool = 0;
-// 	while(!bool){
-// 		algoBellman(graph, sourceNode, tab, panier);
-// 		int test = 0;
-// 		for (int k = 0; k < NbArticlesInPanier; k++)
-// 		{
-// 			test += (nodes[k] != -1);
-// 		}
-// 		bool = test == 0;
-// 		// on trouve le noeud de nodes[] le plus proche de sourceNode
-// 		int min = 100000;
-		
-// 		int i = 0;
-// 		int i_min = 0;
-// 		while(i < NbArticlesInPanier) {
-// 			if(tab[nodes[i]].distance < min && nodes[i] != -1) {
-// 				min = tab[nodes[i]].distance;
-// 				targetNode = nodes[i];
-// 				i_min = i;
-// 			}
-// 			i++;
-// 		}
-// 		nodes[i_min] = -1;
-
-// 		// on trouve le chemin
-// 		pathToTarget(tab, sourceNode, targetNode, path, &nbPathNodes);
-// 		// on affiche le chemin
-// 		printPathToTarget(graph, path, nbPathNodes, sourceNode, targetNode);
-// 		for(int i = 0; i < nbPathNodes; i++) {
-// 			path2[countPath] = path[i];
-// 			countPath++;
-// 		}
-// 		sourceNode = targetNode;
-// 	}
-	
-// }
 
 void remplir_panier(int* panier, char* file, int nbArticles) {
     for (int i = 0; i < nbArticles; i++) {
@@ -741,18 +668,34 @@ void print_catalogue(Article* catalogue, int nbArticles, int print) {
 
 
 
-//representation graphique :
 
- 
-//                                                                               mm               mm      db                                                                   `7MM          db                                  
-//                                                                               MM               MM                                                                             MM                                              
-// `7Mb,od8  .gP"Ya  `7MMpdMAo. `7Mb,od8  .gP"Ya  ,pP"Ybd  .gP"Ya  `7MMpMMMb.  mmMMmm   ,6"Yb.  mmMMmm  `7MM   ,pW"Wq.  `7MMpMMMb.       .P"Ybmmm `7Mb,od8  ,6"Yb.  `7MMpdMAo.   MMpMMMb.  `7MM    ,dW"Yvd  `7MM  `7MM   .gP"Ya  
-//   MM' "' ,M'   Yb   MM   `Wb   MM' "' ,M'   Yb 8I   `" ,M'   Yb   MM    MM    MM    8)   MM    MM      MM  6W'   `Wb   MM    MM      :MI  I8     MM' "' 8)   MM    MM   `Wb   MM    MM    MM   ,W'   MM    MM    MM  ,M'   Yb 
-//   MM     8M""""""   MM    M8   MM     8M"""""" `YMMMa. 8M""""""   MM    MM    MM     ,pm9MM    MM      MM  8M     M8   MM    MM       WmmmP"     MM      ,pm9MM    MM    M8   MM    MM    MM   8M    MM    MM    MM  8M"""""" 
-//   MM     YM.    ,   MM   ,AP   MM     YM.    , L.   I8 YM.    ,   MM    MM    MM    8M   MM    MM      MM  YA.   ,A9   MM    MM      8M          MM     8M   MM    MM   ,AP   MM    MM    MM   YA.   MM    MM    MM  YM.    , 
-// .JMML.    `Mbmmd'   MMbmmd'  .JMML.    `Mbmmd' M9mmmP'  `Mbmmd' .JMML  JMML.  `Mbmo `Moo9^Yo.  `Mbmo .JMML. `Ybmd9'  .JMML  JMML.     YMMMMMb  .JMML.   `Moo9^Yo.  MMbmmd'  .JMML  JMML..JMML.  `MbmdMM    `Mbod"YML. `Mbmmd' 
-//                     MM                                                                                                               6'     dP                     MM                                MM                       
-//                   .JMML.                                                                                                             Ybmmmd'                     .JMML.                            .JMML.        
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////
+//    Representer le graphe avec OpenGL 		 ///
+////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
