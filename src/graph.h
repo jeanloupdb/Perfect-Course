@@ -13,7 +13,7 @@
 #define SIZE_OF_GRAPH 1.8
 
 // Constante pour afficher les details des fonctions : 0 pour non, 1 pour oui
-#define PRINT 1
+#define PRINT 0
 
 #define M_PI 3.14159265358979323846
 
@@ -154,9 +154,9 @@ void createLink(struct Node *node1, struct Node *node2, int print);
  * @param G The graph in which the data will be stored.
  * @param filename The name of the file.
  * @param print The printing option (0 - no printing, 1 - print node details).
- * @return An array containing the read data.
+ * @return The ref of the starting node.
  */
-int *FileRead(struct Graph *G, char *filename, int print);
+int FileRead(struct Graph *G, char *filename, int print);
 
 /**
  * Calculates the distance between two nodes in the graph.
