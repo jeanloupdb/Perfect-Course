@@ -610,7 +610,6 @@ struct Article *catalogue, struct eltBellman *tab, int nbArticles, int print)
 	return nodes;
 }
 	
-
 int main()
 {
 

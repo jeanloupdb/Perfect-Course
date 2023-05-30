@@ -13,7 +13,7 @@
 #define SIZE_OF_GRAPH 1.8
 
 // Constante pour afficher les details des fonctions : 0 pour non, 1 pour oui
-#define PRINT 0
+#define PRINT 1
 
 #define M_PI 3.14159265358979323846
 
