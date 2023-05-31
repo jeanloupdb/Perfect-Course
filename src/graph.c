@@ -9,7 +9,6 @@
 #include "graph.h"
 
 
-
 struct Graph *createGraph(int print)
 {
 	struct Graph *G;
@@ -410,14 +409,13 @@ int scoreArticle(const void *a)
     const Article *articleA = (const Article *)a;
 
     // Facteurs de pondération pour les différents paramètres
-    double poidsFactor = 0.5;
-    double resistanceFactor = 1.0;
-    double volumeFactor = 0.2;
+    // double poidsFactor = 0.5;
+    double fragilityFactor = 1.0;
+    // double volumeFactor = 0.2;
 	double frozFactor = 1.0;
 
 	// Calcul du score
-	double score = poidsFactor * articleA->poids + resistanceFactor * 
-	(1-articleA->resistance) + volumeFactor * articleA->volume + frozFactor * articleA->frozen;
+	double score = (articleA->fragility) * fragilityFactor + (articleA->frozen) * frozFactor ;
 
 	return score;
 }
@@ -454,8 +452,7 @@ void remplir_panier(int* panier, char* file, int nbArticles) {
 
 
 
-int *plus_court_chemin(struct Graph *graph, int *panier, Article *catalogue, 
-int sourceNode, struct eltBellman *tab, int *path2, int NbArticlesInPanier, int nbArticles,  int print) {
+int *plus_court_chemin(struct Graph *graph, int *panier, Article *catalogue, int sourceNode, struct eltBellman *tab, int *path2, int NbArticlesInPanier, int nbArticles, int *articles_sorted, int print) {
     int nbPathNodes;
     int targetNode;
     int nbNodes = 0;
@@ -468,21 +465,26 @@ int sourceNode, struct eltBellman *tab, int *path2, int NbArticlesInPanier, int 
     for (int i = 0; i < nbArticles; i++) {
         if (panier[i] != -1) {
             nodes[nbNodes] = ref_to_node(graph, i);
+			articles_sorted[nbNodes] = i;
             nbNodes++;
         }
     }
-
     // On trie les nodes du panier par ordre selon la fonction scoreArticle(const void *a)
     for (int i = 0; i < nbNodes; i++) {
         for (int j = i + 1; j < nbNodes; j++) {
-            if (scoreArticle(&catalogue[graph->tableNodes[nodes[i]]->productsTab[0]])
-			< scoreArticle(&catalogue[graph->tableNodes[nodes[j]]->productsTab[0]])) {
-                int temp = nodes[i];
-                nodes[i] = nodes[j];
-                nodes[j] = temp;
-            }
-        }
-    }
+			if (scoreArticle(&catalogue[articles_sorted[i]]) > scoreArticle(&catalogue[articles_sorted[j]])) {
+				int temp = nodes[i];
+				nodes[i] = nodes[j];
+				nodes[j] = temp;
+
+				temp = articles_sorted[i];
+				articles_sorted[i] = articles_sorted[j];
+				articles_sorted[j] = temp;
+			
+			}
+		}
+	}
+
 
     // On applique l'algorithme de Bellman-Ford sur les noeuds triés
     for (int i = 0; i < nbNodes; i++) {
@@ -545,6 +547,22 @@ struct Article *catalogue, int nbArticles, int print)
 	}
 }
 
+void print_articles_sorted(int *articles_sorted, struct Article *catalogue, int nbArticles, int print){
+	if(print){
+		printf("\n\n -------------------------------------------------------------------------------------------\n");
+		printf(" ---------------------  Articles du panier triés par ordre de priorité :  ------------------\n");
+		printf(" -------------------------------------------------------------------------------------------\n\n");
+		printf("+----------------------------+------+\n");
+		printf("| %-26s | %-4s |\n", "Article", "ref" );
+		printf("+----------------------------+------+\n");
+		for (int i = 0; i < nbArticles; i++){
+			if(articles_sorted[i] != -1){
+				printf("| %-26s | %-4d |\n", catalogue[articles_sorted[i]].nom, articles_sorted[i]);
+			}
+		}
+		printf("+----------------------------+------+\n");
+	}
+}
 
 
 int *creer_chemin(struct Graph *G, int *path, int *panier, 
@@ -577,10 +595,12 @@ struct Article *catalogue, struct eltBellman *tab, int nbArticles, int print)
 
 	print_catalogue(catalogue, nbArticles, print);
 
+
+	int *articles_sorted = malloc(nbArticles * sizeof(int));
 	remplir_panier(panier, "bdd/cart.txt", nbArticles);
 	int NbArticlesInPanier = getNbArticlesInPanier(panier, nbArticles);
 
-	// int panierCopy[nbArticles];
+	// int panierCopy[nbArticles]; 
 	// for (int i = 0; i < nbArticles; i++) { 
 	// 	panierCopy[i] = panier[i];
 	// }
@@ -603,8 +623,8 @@ struct Article *catalogue, struct eltBellman *tab, int nbArticles, int print)
     printPathToTarget(path, nbPathNodes, start, 12, print);
 	
 	int *nodes = plus_court_chemin(G, panier, catalogue, start, 
-	tab, path, NbArticlesInPanier,nbArticles, print);
-
+	tab, path, NbArticlesInPanier,nbArticles,articles_sorted , print);
+	print_articles_sorted(articles_sorted, catalogue, NbArticlesInPanier, print);
 	print_path(G, path, panier, catalogue, nbArticles, print);
 
 	return nodes;
@@ -649,7 +669,7 @@ void remplir_catalogue(Article* catalogue, char* nom_fichier) {
 		token = strtok(NULL, " ");
 		catalogue[i].volume = atof(token);
 		token = strtok(NULL, " ");
-		catalogue[i].resistance = atof(token);
+		catalogue[i].fragility = atof(token);
 		token = strtok(NULL, " ");
         if (token != NULL) {
             int frozen_value = atoi(token);
@@ -670,12 +690,12 @@ void print_catalogue(Article* catalogue, int nbArticles, int print) {
 	{
 		printf("\n\nCatalogue :\n\n");
 		printf("+------+----------------------------+------------+--------+--------+------------+---------+\n");
-		printf("| Ref. | Nom                        |   Prix     |  Poids | Volume | Resistance | surgele |\n");
+		printf("| Ref. | Nom                        |   Prix     |  Poids | Volume | fragilite | surgele |\n");
 		printf("+------+----------------------------+------------+--------+--------+------------+---------+\n");
 		for (int i = 0; i < nbArticles; i++) {
 			printf("| %4d | %-26s | %10.2f | %6.2f | %6.2f | %10.2f | %7d |\n",
 				catalogue[i].ref, catalogue[i].nom, catalogue[i].prix, catalogue[i].poids, 
-				catalogue[i].volume, catalogue[i].resistance, catalogue->frozen);
+				catalogue[i].volume, catalogue[i].fragility, catalogue->frozen);
 		}
 		printf("+------+----------------------------+------------+--------+--------+------------+---------+\n");
 	}

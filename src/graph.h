@@ -55,7 +55,7 @@ typedef struct Article {
     float prix;          // Prix de l'article
     float poids;         // Poids de l'article (en kg)
     float volume;        // Volume de l'article (en m3)
-    float resistance;    // Résistance de l'article entre 0 et 1
+    float fragility;    // fragilite de l'article entre 0 et 1
     int frozen;          // Indicateur indiquant si l'article est congelé (1) ou non (0)
 } Article;
 
@@ -265,11 +265,11 @@ void remplir_panier(int *panier, char *file, int nbArticles);
  * @param path2 The array to store the shortest path.
  * @param NbArticlesInPanier The number of articles in the cart.
  * @param nbArticles The total number of articles.
+ * @param articles_sorted The array containing the articles sorted by score (not filled yet).
  * @param print The printing option (0 - no printing, 1 - print node details).
  * @return The shortest path as an array.
  */
-int *plus_court_chemin(struct Graph *graph, int *panier, Article *catalogue, int sourceNode, struct eltBellman *tab, int *path2, int NbArticlesInPanier, int nbArticles, int print);
-
+int *plus_court_chemin(struct Graph *graph, int *panier, Article *catalogue, int sourceNode, struct eltBellman *tab, int *path2, int NbArticlesInPanier, int nbArticles, int *articles_sorted, int print);
 /**
  * Prints the path based on the given graph, path, cart, catalogue, and printing option.
  *
@@ -344,7 +344,7 @@ void drawLine(int x1, int y1, int x2, int y2);
 void drawArrow(int x1, int y1, int x2, int y2);
 
 /**
- * Draws the iterator path at the specified position.
+ * Draws the order of the cart items.
  *
  * @param x The X-coordinate of the iterator path.
  * @param y The Y-coordinate of the iterator path.

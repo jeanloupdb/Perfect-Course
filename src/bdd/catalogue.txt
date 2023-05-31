@@ -5,7 +5,7 @@
 4 oeufs 2.99 0.4 0.4 1 0 
 5 pain 1.29 0.5 0.5 0 0 
 6 baguette 0.99 0.4 0.4 0 0 
-7 croissant 0.79 0.1 0.1 0 0 
+7 croissant 0.79 0.1 0.1 1 0 
 8 biscottes 1.49 0.3 0.3 1 0 
 9 cereales 3.29 0.5 0.5 0 0 
 10 chocolat_en_poudre 2.79 0.5 0.5 0 0 
@@ -50,7 +50,7 @@
 49 poire 0.99 0.2 0.2 0 0 
 50 kiwi 0.99 0.2 0.2 0 0 
 51 ananas 0.99 0.2 0.2 0 0 
-52 fraise 0.99 0.2 0.2 0 0 
+52 fraise 0.99 0.2 0.2 1 0
 53 framboise 0.99 0.2 0.2 0 0 
 54 cerise 0.99 0.2 0.2 0 0 
 55 raisin 0.99 0.2 0.2 1 0 
@@ -62,7 +62,7 @@
 61 carotte 0.99 0.2 0.2 0 0 
 62 courgette 0.99 0.2 0.2 0 0 
 63 aubergine 0.99 0.2 0.2 0 0 
-64 oignon 0.99 0.2 0.2 0 0 
+64 oignon 0.99 0.2 0.2 0 0
 65 ail 0.99 0.2 0.2 0 0 
 66 echalote 0.99 0.2 0.2 0 0 
 67 pomme_de_terre 0.99 0.2 0.2 0 0 
