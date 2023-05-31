@@ -409,13 +409,14 @@ int scoreArticle(const void *a)
     const Article *articleA = (const Article *)a;
 
     // Facteurs de pondération pour les différents paramètres
-    // double poidsFactor = 0.5;
+    double poidsFactor = 0.5;
     double fragilityFactor = 1.0;
-    // double volumeFactor = 0.2;
+    double volumeFactor = 0.2;
 	double frozFactor = 1.0;
 
 	// Calcul du score
-	double score = (articleA->fragility) * fragilityFactor + (articleA->frozen) * frozFactor ;
+	double score = (articleA->fragility) * fragilityFactor + (articleA->frozen) 
+	* frozFactor - (articleA->volume) * volumeFactor - (articleA->poids) * poidsFactor;
 
 	return score;
 }
@@ -552,15 +553,15 @@ void print_articles_sorted(int *articles_sorted, struct Article *catalogue, int 
 		printf("\n\n -------------------------------------------------------------------------------------------\n");
 		printf(" ---------------------  Articles du panier triés par ordre de priorité :  ------------------\n");
 		printf(" -------------------------------------------------------------------------------------------\n\n");
-		printf("+----------------------------+------+\n");
-		printf("| %-26s | %-4s |\n", "Article", "ref" );
-		printf("+----------------------------+------+\n");
+		printf("+----------------------------+------+----------+\n");
+		printf("| %-26s | %-4s | %-8s |\n", "Article", "ref", "Priorité");
+		printf("+----------------------------+------+----------+\n");
 		for (int i = 0; i < nbArticles; i++){
 			if(articles_sorted[i] != -1){
-				printf("| %-26s | %-4d |\n", catalogue[articles_sorted[i]].nom, articles_sorted[i]);
+				printf("| %-26s | %-4d | %-8d |\n", catalogue[articles_sorted[i]].nom, articles_sorted[i], i+1);
 			}
 		}
-		printf("+----------------------------+------+\n");
+		printf("+----------------------------+------+----------+\n");
 	}
 }
 
